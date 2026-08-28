@@ -4,12 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
   <meta name="theme-color" content="#0b5680" />
-  <title>Angelspiel V1.0</title>
-  <link rel="stylesheet" href="style.css?v=1.0.0-20260828" />
+  <title>Angelspiel V1.1</title>
+  <link rel="stylesheet" href="style.css?v=1.1.0-20260828" />
 </head>
 <body>
   <div id="app">
-    <div id="versionBadge">Angelspiel V1.0</div>
+    <div id="versionBadge">Angelspiel V1.1</div>
 
     <section id="boatScene" class="scene active" aria-label="Boot fahren">
       <div class="skyGlow"></div>
@@ -31,12 +31,19 @@
         <div class="wake wakeLeft"></div>
         <div class="wake wakeRight"></div>
         <div class="boatShadow"></div>
-        <div class="hull"></div>
-        <div class="deck"></div>
-        <div class="cabin"><div class="window"></div></div>
-        <div class="console"></div>
-        <div class="seat"></div>
-        <div class="motor"></div>
+        <div class="hull"><div class="hullStripe"></div></div>
+        <div class="deck">
+          <div class="bowCushion"></div>
+          <div class="cockpitWell"></div>
+          <div class="rearBench"></div>
+        </div>
+        <div class="windshield"><span></span><span></span></div>
+        <div class="console"><i></i></div>
+        <div class="seat seatLeft"></div>
+        <div class="seat seatRight"></div>
+        <div class="rail railBoatLeft"></div>
+        <div class="rail railBoatRight"></div>
+        <div class="motor"><div class="motorCap"></div></div>
       </div>
 
       <div class="hud topHud">
@@ -96,6 +103,6 @@
     </section>
   </div>
 
-  <script src="game.js?v=1.0.0-20260828"></script>
+  <script src="game.js?v=1.1.0-20260828"></script>
 </body>
 </html>
