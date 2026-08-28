@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#0b4f69">
+  <title>Fishing Adventures V1.2</title>
+  <link rel="stylesheet" href="style.css?v=1.2.0-20260828-1612">
+</head>
+<body>
+<div id="app">
+  <div id="versionBadge">V1.2</div>
+
+  <section id="boatScene" class="scene active" aria-label="Bootfahrt">
+    <div id="boat" class="movingBoat" aria-label="Isometrisches Motorboot">
+      <img src="boat_iso_v12.png?v=1.2.0-20260828-1612" alt="Isometrisches Motorboot">
+      <div class="dynamicWake"></div>
+    </div>
+
+    <div id="speedHud" class="speedHud" aria-live="polite">
+      <div class="needle" id="needle"></div>
+      <strong id="speedValue">0</strong><small>km/h</small>
+    </div>
+
+    <div class="steeringZone" aria-label="Lenkung">
+      <button id="leftBtn" class="hitButton" aria-label="Nach links lenken"></button>
+      <button id="rightBtn" class="hitButton" aria-label="Nach rechts lenken"></button>
+    </div>
+    <div class="pedalZone" aria-label="Gas und Bremse">
+      <button id="gasBtn" class="hitButton" aria-label="Gas"></button>
+      <button id="brakeBtn" class="hitButton" aria-label="Bremse"></button>
+    </div>
+
+    <div id="goalOverlay" class="goalOverlay">Fahr zum markierten Angelplatz.</div>
+    <button id="fishBtn" class="fishButton hidden">🎣 Angeln</button>
+  </section>
+
+  <section id="fishingScene" class="scene" aria-label="Auf dem Boot">
+    <div id="player" class="isoPlayer" aria-label="Spielfigur">
+      <img src="player_iso_v12.png?v=1.2.0-20260828-1612" alt="Mensch auf dem Boot">
+    </div>
+
+    <div id="joystick" class="joystick" aria-label="Bewegungsjoystick">
+      <div class="joyRing"><div id="stick" class="stick"></div></div>
+    </div>
+    <button id="backBtn" class="backHit" aria-label="Zur Bootfahrt"></button>
+    <div class="movementHint">Bewege den Punkt, um dich zu bewegen.</div>
+  </section>
+</div>
+<script src="game.js?v=1.2.0-20260828-1612"></script>
+</body>
+</html>
