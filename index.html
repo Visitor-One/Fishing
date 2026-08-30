@@ -1,52 +1,74 @@
 <!doctype html>
 <html lang="de">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-  <meta name="theme-color" content="#0b4f69">
-  <title>Fishing Adventures V1.2</title>
-  <link rel="stylesheet" href="style.css?v=1.2.0-20260828-1612">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#0b4f69">
+<title>Fishing Adventures V1.5</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#0b5870;color:#fff}button{font:inherit;color:inherit;border:0;touch-action:none}#app,.scene{position:absolute;inset:0;overflow:hidden}.scene{display:none}.scene.active{display:block}
+#boatScene{background:linear-gradient(#66b8c8 0 8%,#177394 8% 100%)}#boatScene:before{content:"";position:absolute;inset:8% 0 0;background:repeating-linear-gradient(165deg,rgba(255,255,255,.11) 0 2px,transparent 2px 22px),repeating-linear-gradient(15deg,rgba(255,255,255,.05) 0 1px,transparent 1px 30px)}
+.hud{position:absolute;z-index:10;background:rgba(5,20,25,.78);border:1px solid rgba(255,255,255,.55);border-radius:16px;padding:12px 14px;backdrop-filter:blur(6px)}#goal{left:18px;top:18px;min-width:245px}.label{font-size:12px;color:#76f5a0;font-weight:800;letter-spacing:.08em}.version{right:16px;top:16px;font-weight:800}.speed{left:50%;bottom:14px;transform:translateX(-50%);font-weight:800;font-size:22px}.zone{position:absolute;left:68%;top:45%;width:150px;height:88px;border:5px dashed #ffd11a;border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 0 6px rgba(255,209,26,.08)}.zone:after{content:"📍";position:absolute;left:50%;top:50%;transform:translate(-50%,-58%);font-size:42px}
+#boat{position:absolute;left:38%;top:67%;width:150px;height:88px;transform:translate(-50%,-50%) rotate(20deg);transform-origin:50% 50%;z-index:5;filter:drop-shadow(0 15px 11px rgba(0,0,0,.32))}.boatWrap{position:absolute;inset:0;transform:skewY(-10deg)}.hull{position:absolute;inset:8px 5px 7px;border-radius:52% 48% 42% 46%/48% 46% 54% 52%;background:linear-gradient(145deg,#f8f8f5 0 45%,#c8d0d1 46% 60%,#23343c 61% 70%,#f1f1ec 71%);clip-path:polygon(50% 0,94% 26%,100% 72%,73% 100%,23% 100%,0 68%,7% 26%)}.deck{position:absolute;left:19px;right:20px;top:17px;bottom:17px;clip-path:polygon(50% 0,91% 28%,92% 72%,70% 100%,27% 100%,8% 70%,10% 28%);background:linear-gradient(145deg,#c7a26d,#8c6944 58%,#3f4547 59% 100%);box-shadow:inset 0 0 0 3px rgba(255,255,255,.5)}.glass{position:absolute;left:42px;top:30px;width:66px;height:24px;border-radius:50% 50% 25% 25%;background:linear-gradient(145deg,rgba(174,224,235,.9),rgba(40,90,103,.9));border:3px solid #e6eeee}.seat{position:absolute;width:20px;height:22px;border-radius:6px;background:linear-gradient(#eee,#aaa);top:47px}.seat.s1{left:48px}.seat.s2{right:47px}.motor{position:absolute;left:61px;bottom:-11px;width:27px;height:31px;border-radius:8px 8px 12px 12px;background:linear-gradient(145deg,#23292d,#050708);box-shadow:inset -4px -4px rgba(255,255,255,.05)}.driver{position:absolute;left:68px;top:39px;width:15px;height:22px;border-radius:8px 8px 5px 5px;background:#132f5f;box-shadow:0 -6px 0 -2px #d7ae86}.wake{position:absolute;left:50%;top:82%;width:18px;height:0;transform:translateX(-50%);opacity:0}.moving .wake{opacity:1;height:130px;background:linear-gradient(rgba(255,255,255,.8),rgba(255,255,255,0));clip-path:polygon(35% 0,65% 0,100% 100%,0 100%);filter:blur(2px)}
+.controls{position:absolute;bottom:20px;z-index:12;display:flex;gap:18px}.steer{left:22px}.pedals{right:22px}.ctrl{width:88px;height:76px;border-radius:17px;background:linear-gradient(#4b545a,#1e262b);box-shadow:0 6px 0 #111, inset 0 0 0 2px rgba(255,255,255,.25);font-size:42px;font-weight:900}.ctrl:active,.ctrl.pressed{transform:translateY(4px);box-shadow:0 2px 0 #111}.gas{background:linear-gradient(#43c35d,#187c2f);font-size:34px}.brake{background:linear-gradient(#f05b5b,#a82222);font-size:34px}#fishBtn{position:absolute;left:50%;top:73%;transform:translate(-50%,-50%);z-index:15;background:#ffd11a;color:#13202a;font-weight:900;padding:14px 22px;border-radius:16px;box-shadow:0 5px 0 #977d00}.hidden{display:none!important}
+#fishingScene{background:linear-gradient(165deg,#1d819c 0 100%)}#fishingScene:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(170deg,rgba(255,255,255,.08) 0 2px,transparent 2px 28px)}.deckIso{position:absolute;left:50%;top:48%;width:min(76vw,760px);height:min(68vw,530px);transform:translate(-50%,-50%) rotate(-20deg) skewX(8deg);border-radius:48% 46% 42% 44%;clip-path:polygon(50% 0,92% 22%,100% 73%,76% 100%,20% 100%,0 70%,8% 22%);background:linear-gradient(145deg,#f5f0e8 0 8%,#42474a 8% 85%,#d6d0c5 85% 100%);box-shadow:0 30px 35px rgba(0,0,0,.35),inset 0 0 0 6px rgba(255,255,255,.7)}.deckIso:before{content:"";position:absolute;inset:13% 10% 12%;clip-path:inherit;background:repeating-linear-gradient(90deg,#555b5e 0 45px,#474c4e 45px 47px);opacity:.9}.console{position:absolute;left:38%;top:18%;width:24%;height:20%;background:#161b1e;border:5px solid #cfd6d6;border-radius:14px;transform:rotate(-2deg);z-index:3}.console:after{content:"◉  ◉  ◉";position:absolute;inset:35% 8%;font-size:18px;color:#d7e7e8}.cooler{position:absolute;right:18%;top:34%;width:16%;height:13%;background:#d7dde0;border:4px solid #9fa8ad;border-radius:8px;z-index:3}.rods{position:absolute;right:9%;top:22%;width:3px;height:44%;background:#2b2418;box-shadow:12px 0 #2b2418,24px 0 #2b2418;z-index:4}.motor2{position:absolute;left:42%;bottom:-4%;width:18%;height:23%;background:linear-gradient(145deg,#2c3337,#080b0c);border-radius:20px;z-index:3}.player{position:absolute;left:50%;top:56%;width:44px;height:72px;transform:translate(-50%,-50%);z-index:8;filter:drop-shadow(0 8px 5px rgba(0,0,0,.35))}.head{position:absolute;left:13px;top:0;width:18px;height:18px;border-radius:50%;background:#d2a47d;box-shadow:0 -5px 0 -2px #1a3f70}.body{position:absolute;left:9px;top:17px;width:27px;height:32px;border-radius:9px;background:#164a7b}.leg{position:absolute;top:46px;width:10px;height:24px;background:#b59167;border-radius:5px}.leg.l{left:10px}.leg.r{right:9px}.shoe{position:absolute;top:66px;width:13px;height:7px;background:#15191b;border-radius:5px}.shoe.l{left:7px}.shoe.r{right:6px}.joy{position:absolute;left:25px;bottom:25px;width:150px;height:150px;border-radius:50%;border:4px solid rgba(255,255,255,.75);background:rgba(0,0,0,.18);z-index:15;touch-action:none}.stick{position:absolute;left:50%;top:50%;width:58px;height:58px;border-radius:50%;transform:translate(-50%,-50%);background:linear-gradient(#fff,#ccd3d6);box-shadow:0 4px 10px rgba(0,0,0,.3)}#backBtn{position:absolute;left:22px;top:20px;z-index:16;background:rgba(7,25,31,.8);padding:13px 18px;border-radius:14px;border:1px solid #7fd8ff}.moveHint{position:absolute;right:20px;top:20px;z-index:16;background:rgba(7,25,31,.8);padding:12px 15px;border-radius:14px;max-width:230px}
+
+.fishControls{position:absolute;right:24px;bottom:22px;z-index:18;width:170px;height:170px}.fishControls .fbtn{position:absolute;width:58px;height:58px;border-radius:14px;background:linear-gradient(#3d4a50,#172126);box-shadow:0 5px 0 #0b0f11,inset 0 0 0 2px rgba(255,255,255,.25);font-size:30px;font-weight:900}.fishControls .fbtn:active,.fishControls .fbtn.pressed{transform:translateY(3px);box-shadow:0 2px 0 #0b0f11}.fishControls .up{left:56px;top:0}.fishControls .down{left:56px;bottom:0}.fishControls .left{left:0;top:56px}.fishControls .right{right:0;top:56px}.fishLabel{position:absolute;right:26px;bottom:198px;z-index:18;background:rgba(7,25,31,.82);padding:8px 12px;border-radius:12px;font-weight:800}.rodLine{position:absolute;left:58%;top:46%;width:3px;height:180px;background:linear-gradient(#d8e2e5,#87989d);transform-origin:top center;z-index:9;pointer-events:none}.bobber{position:absolute;left:74%;top:64%;width:24px;height:24px;border-radius:50%;background:linear-gradient(#ff4b3e 0 50%,#f8f8f8 50%);border:2px solid #111;z-index:10;box-shadow:0 4px 8px rgba(0,0,0,.35)}.fishTarget{position:absolute;width:46px;height:24px;border-radius:60% 50% 50% 60%;background:#e0b43e;z-index:6;filter:drop-shadow(0 5px 4px rgba(0,0,0,.28));opacity:.9}.fishTarget:before{content:"";position:absolute;right:-13px;top:5px;border-left:15px solid #e0b43e;border-top:7px solid transparent;border-bottom:7px solid transparent}.catchHud{position:absolute;left:50%;top:16px;transform:translateX(-50%);z-index:20;background:rgba(7,25,31,.82);padding:10px 15px;border-radius:14px;font-weight:900}.catchFlash{animation:catchPop .55s ease}@keyframes catchPop{0%{transform:translateX(-50%) scale(1)}45%{transform:translateX(-50%) scale(1.28)}100%{transform:translateX(-50%) scale(1)}}
+@media(max-width:700px){#goal{min-width:0;width:215px}.ctrl{width:72px;height:64px}.controls{gap:10px}.zone{width:120px;height:70px}.speed{bottom:110px}.deckIso{width:88vw;height:68vw}.joy{width:125px;height:125px}.moveHint{top:auto;bottom:210px;right:12px;max-width:170px;font-size:13px}.fishControls{right:12px;bottom:18px;transform:scale(.9);transform-origin:bottom right}.fishLabel{right:14px;bottom:185px;font-size:12px}}
+</style>
 </head>
 <body>
 <div id="app">
-  <div id="versionBadge">V1.2</div>
-
-  <section id="boatScene" class="scene active" aria-label="Bootfahrt">
-    <div id="boat" class="movingBoat" aria-label="Isometrisches Motorboot">
-      <img src="boat_iso_v12.png?v=1.2.0-20260828-1612" alt="Isometrisches Motorboot">
-      <div class="dynamicWake"></div>
-    </div>
-
-    <div id="speedHud" class="speedHud" aria-live="polite">
-      <div class="needle" id="needle"></div>
-      <strong id="speedValue">0</strong><small>km/h</small>
-    </div>
-
-    <div class="steeringZone" aria-label="Lenkung">
-      <button id="leftBtn" class="hitButton" aria-label="Nach links lenken"></button>
-      <button id="rightBtn" class="hitButton" aria-label="Nach rechts lenken"></button>
-    </div>
-    <div class="pedalZone" aria-label="Gas und Bremse">
-      <button id="gasBtn" class="hitButton" aria-label="Gas"></button>
-      <button id="brakeBtn" class="hitButton" aria-label="Bremse"></button>
-    </div>
-
-    <div id="goalOverlay" class="goalOverlay">Fahr zum markierten Angelplatz.</div>
-    <button id="fishBtn" class="fishButton hidden">🎣 Angeln</button>
-  </section>
-
-  <section id="fishingScene" class="scene" aria-label="Auf dem Boot">
-    <div id="player" class="isoPlayer" aria-label="Spielfigur">
-      <img src="player_iso_v12.png?v=1.2.0-20260828-1612" alt="Mensch auf dem Boot">
-    </div>
-
-    <div id="joystick" class="joystick" aria-label="Bewegungsjoystick">
-      <div class="joyRing"><div id="stick" class="stick"></div></div>
-    </div>
-    <button id="backBtn" class="backHit" aria-label="Zur Bootfahrt"></button>
-    <div class="movementHint">Bewege den Punkt, um dich zu bewegen.</div>
-  </section>
+<section id="boatScene" class="scene active">
+  <div id="goal" class="hud"><div class="label">ZIEL</div><strong>Finde den Angelplatz</strong><div id="goalText">Fahr zum markierten Bereich.</div></div>
+  <div class="hud version">V1.5</div>
+  <div class="zone"></div>
+  <div id="boat"><div class="wake"></div><div class="boatWrap"><div class="hull"></div><div class="deck"></div><div class="glass"></div><div class="seat s1"></div><div class="seat s2"></div><div class="driver"></div><div class="motor"></div></div></div>
+  <div class="controls steer"><button id="leftBtn" class="ctrl">←</button><button id="rightBtn" class="ctrl">→</button></div>
+  <div class="controls pedals"><button id="gasBtn" class="ctrl gas">G</button><button id="brakeBtn" class="ctrl brake">B</button></div>
+  <div class="hud speed"><span id="speedValue">0</span> km/h</div>
+  <button id="fishBtn" class="hidden">🎣 Zum Angelplatz</button>
+</section>
+<section id="fishingScene" class="scene">
+  <div class="hud version">V1.5</div>
+  <div class="deckIso"><div class="console"></div><div class="cooler"></div><div class="rods"></div><div class="motor2"></div></div>
+  <div id="player" class="player"><div class="head"></div><div class="body"></div><div class="leg l"></div><div class="leg r"></div><div class="shoe l"></div><div class="shoe r"></div></div>
+  <div id="joystick" class="joy"><div id="stick" class="stick"></div></div>
+  <div id="rodLine" class="rodLine"></div><div id="bobber" class="bobber"></div><div id="fishTarget" class="fishTarget"></div>
+  <div id="catchHud" class="catchHud">🎣 Fische: <span id="catchCount">0</span></div>
+  <div class="fishLabel">ANGEL STEUERN</div>
+  <div class="fishControls" aria-label="Angelsteuerung">
+    <button id="rodUp" class="fbtn up" aria-label="Angel hoch">▲</button>
+    <button id="rodDown" class="fbtn down" aria-label="Angel runter">▼</button>
+    <button id="rodLeft" class="fbtn left" aria-label="Angel links">◀</button>
+    <button id="rodRight" class="fbtn right" aria-label="Angel rechts">▶</button>
+  </div>
+  <button id="backBtn">⛵ Zur Bootfahrt</button><div class="moveHint"><strong>BEWEGUNG</strong><br>Links: Mensch bewegen.<br>Rechts: Angel steuern.</div>
+</section>
 </div>
-<script src="game.js?v=1.2.0-20260828-1612"></script>
-</body>
-</html>
+<script>
+(()=>{'use strict';
+const q=id=>document.getElementById(id),boatScene=q('boatScene'),fishingScene=q('fishingScene'),boat=q('boat'),speedValue=q('speedValue'),goalText=q('goalText'),fishBtn=q('fishBtn');
+const held={left:false,right:false,gas:false,brake:false},state={x:.38,y:.67,angle:20,speed:0};
+const rodHeld={up:false,down:false,left:false,right:false},rodState={x:.74,y:.64},catchCount=0;
+function hold(el,key){const on=e=>{e.preventDefault();held[key]=true;el.classList.add('pressed');try{el.setPointerCapture(e.pointerId)}catch(_){}};const off=e=>{e.preventDefault();held[key]=false;el.classList.remove('pressed')};el.addEventListener('pointerdown',on);['pointerup','pointercancel','lostpointercapture'].forEach(n=>el.addEventListener(n,off));}
+hold(q('leftBtn'),'left');hold(q('rightBtn'),'right');hold(q('gasBtn'),'gas');hold(q('brakeBtn'),'brake');
+function rodHold(el,key){const on=e=>{e.preventDefault();rodHeld[key]=true;el.classList.add('pressed');try{el.setPointerCapture(e.pointerId)}catch(_){}};const off=e=>{e.preventDefault();rodHeld[key]=false;el.classList.remove('pressed')};el.addEventListener('pointerdown',on);['pointerup','pointercancel','lostpointercapture'].forEach(n=>el.addEventListener(n,off));}
+rodHold(q('rodUp'),'up');rodHold(q('rodDown'),'down');rodHold(q('rodLeft'),'left');rodHold(q('rodRight'),'right');
+const bobber=q('bobber'),rodLine=q('rodLine'),fishTarget=q('fishTarget'),catchHud=q('catchHud'),catchCountEl=q('catchCount');
+let fishPos={x:.76,y:.48};
+function placeFish(){fishPos.x=.60+Math.random()*.30;fishPos.y=.34+Math.random()*.42;fishTarget.style.left=(fishPos.x*100)+'%';fishTarget.style.top=(fishPos.y*100)+'%';}
+placeFish();
+function switchScene(fishing){boatScene.classList.toggle('active',!fishing);fishingScene.classList.toggle('active',fishing);Object.keys(held).forEach(k=>held[k]=false);Object.keys(rodHeld).forEach(k=>rodHeld[k]=false)}
+fishBtn.addEventListener('click',()=>switchScene(true));q('backBtn').addEventListener('click',()=>switchScene(false));
+const joystick=q('joystick'),stick=q('stick'),player=q('player'),joy={active:false,id:null,x:0,y:0},ps={x:.5,y:.56};
+function setJoy(x,y){const r=joystick.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;let dx=x-cx,dy=y-cy,max=r.width*.30,l=Math.hypot(dx,dy)||1;if(l>max){dx=dx/l*max;dy=dy/l*max}joy.x=dx/max;joy.y=dy/max;stick.style.transform=`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px))`}
+function resetJoy(){joy.active=false;joy.id=null;joy.x=joy.y=0;stick.style.transform='translate(-50%,-50%)'}
+joystick.addEventListener('pointerdown',e=>{e.preventDefault();joy.active=true;joy.id=e.pointerId;try{joystick.setPointerCapture(e.pointerId)}catch(_){}setJoy(e.clientX,e.clientY)});joystick.addEventListener('pointermove',e=>{if(joy.active&&e.pointerId===joy.id)setJoy(e.clientX,e.clientY)});joystick.addEventListener('pointerup',resetJoy);joystick.addEventListener('pointercancel',resetJoy);
+let last=performance.now();function loop(now){const dt=Math.min(.035,(now-last)/1000);last=now;if(boatScene.classList.contains('active')){if(held.gas)state.speed+=.30*dt;else state.speed-=.07*dt;if(held.brake)state.speed-=.65*dt;state.speed=Math.max(0,Math.min(.32,state.speed));const turn=(.35+state.speed*2.6)*dt;if(held.left)state.angle-=90*turn;if(held.right)state.angle+=90*turn;const r=state.angle*Math.PI/180;state.x+=Math.sin(r)*state.speed*dt*.39;state.y-=Math.cos(r)*state.speed*dt*.39;state.x=Math.max(.08,Math.min(.92,state.x));state.y=Math.max(.15,Math.min(.9,state.y));boat.style.left=state.x*100+'%';boat.style.top=state.y*100+'%';boat.style.transform=`translate(-50%,-50%) rotate(${state.angle}deg)`;boat.classList.toggle('moving',state.speed>.03);speedValue.textContent=Math.round(state.speed/.32*35);const d=Math.hypot(state.x-.68,state.y-.45),inZone=d<.105,stopped=state.speed<.025;if(inZone&&stopped){goalText.textContent='Angelplatz erreicht!';fishBtn.classList.remove('hidden')}else if(inZone){goalText.textContent='Jetzt bremsen.';fishBtn.classList.add('hidden')}else{goalText.textContent='Fahr zum markierten Bereich.';fishBtn.classList.add('hidden')}}
+if(fishingScene.classList.contains('active')){const m=Math.hypot(joy.x,joy.y);if(m>.08){ps.x+=joy.x*.17*dt;ps.y+=joy.y*.17*dt;ps.x=Math.max(.34,Math.min(.66,ps.x));ps.y=Math.max(.33,Math.min(.72,ps.y));player.style.left=ps.x*100+'%';player.style.top=ps.y*100+'%';player.style.transform=`translate(-50%,-50%) rotate(${joy.x*6}deg)`}
+const rs=.22*dt;if(rodHeld.up)rodState.y-=rs;if(rodHeld.down)rodState.y+=rs;if(rodHeld.left)rodState.x-=rs;if(rodHeld.right)rodState.x+=rs;rodState.x=Math.max(.56,Math.min(.92,rodState.x));rodState.y=Math.max(.30,Math.min(.82,rodState.y));bobber.style.left=(rodState.x*100)+'%';bobber.style.top=(rodState.y*100)+'%';const anchorX=.58,anchorY=.46,dx=(rodState.x-anchorX)*innerWidth,dy=(rodState.y-anchorY)*innerHeight,len=Math.hypot(dx,dy),ang=Math.atan2(dx,dy)*180/Math.PI;rodLine.style.height=Math.max(30,len)+'px';rodLine.style.transform=`rotate(${-ang}deg)`;
+if(Math.hypot(rodState.x-fishPos.x,rodState.y-fishPos.y)<.045){catchCount++;catchCountEl.textContent=catchCount;catchHud.classList.remove('catchFlash');void catchHud.offsetWidth;catchHud.classList.add('catchFlash');placeFish();}}requestAnimationFrame(loop)}requestAnimationFrame(loop);
+})();
+</script>
+</body></html>
