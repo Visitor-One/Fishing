@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#0b4f69">
-<meta name="app-version" content="1.8.0">
+<meta name="app-version" content="1.9.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<title>Fishing Adventures V1.8</title>
+<title>Fishing Adventures V1.9</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#0b5870;color:#fff}button{font:inherit;color:inherit;border:0;touch-action:none}#app,.scene{position:absolute;inset:0;overflow:hidden}.scene{display:none}.scene.active{display:block}
 #boatScene{background:linear-gradient(#66b8c8 0 8%,#177394 8% 100%)}#boatScene:before{content:"";position:absolute;inset:8% 0 0;background:repeating-linear-gradient(165deg,rgba(255,255,255,.11) 0 2px,transparent 2px 22px),repeating-linear-gradient(15deg,rgba(255,255,255,.05) 0 1px,transparent 1px 30px)}
@@ -30,21 +30,29 @@ clip-path:polygon(50% 0,96% 29%,100% 69%,74% 100%,20% 96%,0 65%,8% 24%)}
 #boat .driver{left:78px;top:38px}
 #boat .motor{left:73px;bottom:-13px;width:30px;height:35px}
 
+
+/* V1.9 – realistisches isometrisches Offshore-Angelboot */
+#boat{width:260px;height:180px;perspective:none;filter:drop-shadow(0 18px 13px rgba(0,0,0,.38))}
+#boat .realBoat{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;pointer-events:none;
+clip-path:polygon(3% 10%,97% 10%,97% 96%,3% 96%)}
+#boat .wake{left:50%;top:78%;z-index:-1}
+@media(max-width:700px){#boat{width:205px;height:142px}}
+
 </style>
 </head>
 <body>
 <div id="app">
 <section id="boatScene" class="scene active">
   <div id="goal" class="hud"><div class="label">FREIE FAHRT</div><strong>Fahr, wohin du möchtest</strong><div id="goalText">Zum Angeln anhalten.</div></div>
-  <div class="hud version">V1.8</div>
-  <div id="boat"><div class="wake"></div><div class="boatWrap"><div class="hull"></div><div class="deck"></div><div class="glass"></div><div class="seat s1"></div><div class="seat s2"></div><div class="driver"></div><div class="motor"></div></div></div>
+  <div class="hud version">V1.9</div>
+  <div id="boat"><div class="wake"></div><img class="realBoat" src="offshore_boat_v19.png?v=1.9.0" alt="Isometrisches Offshore-Angelboot"></div>
   <div class="controls steer"><button id="leftBtn" class="ctrl">←</button><button id="rightBtn" class="ctrl">→</button></div>
   <div class="controls pedals"><button id="gasBtn" class="ctrl gas">G</button><button id="brakeBtn" class="ctrl brake">B</button></div>
   <div class="hud speed"><span id="speedValue">0</span> km/h</div>
   <button id="fishBtn" class="hidden">🎣 Hier angeln</button>
 </section>
 <section id="fishingScene" class="scene">
-  <div class="hud version">V1.8</div>
+  <div class="hud version">V1.9</div>
   <div class="deckIso"><div class="console"></div><div class="cooler"></div><div class="rods"></div><div class="motor2"></div></div>
   <div id="player" class="player"><div class="head"></div><div class="body"></div><div class="leg l"></div><div class="leg r"></div><div class="shoe l"></div><div class="shoe r"></div></div>
   <div id="joystick" class="joy"><div id="stick" class="stick"></div></div>
