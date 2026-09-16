@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#0b4f69">
-<meta name="app-version" content="3.4.0">
+<meta name="app-version" content="3.5.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<title>Fishing Adventures V3.4</title>
+<title>Fishing Adventures V3.5</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#0b5870;color:#fff}button{font:inherit;color:inherit;border:0;touch-action:none}#app,.scene{position:absolute;inset:0;overflow:hidden}.scene{display:none}.scene.active{display:block}
 #boatScene{background:linear-gradient(#66b8c8 0 8%,#177394 8% 100%)}#boatScene:before{content:"";position:absolute;inset:8% 0 0;background:repeating-linear-gradient(165deg,rgba(255,255,255,.11) 0 2px,transparent 2px 22px),repeating-linear-gradient(15deg,rgba(255,255,255,.05) 0 1px,transparent 1px 30px)}
@@ -203,27 +203,33 @@ clip-path:polygon(3% 10%,97% 10%,97% 96%,3% 96%)}
 .horizonGlow{position:absolute;left:0;right:0;top:14%;height:16%;z-index:2;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,.12),transparent 70%)}
 .playBoat{z-index:12!important}.boatWake{z-index:10!important}
 
+
+/* V3.5 3D scene */
+#boat,.playBoat,.boatWake,.simWorld,.waveFoam,.realBoat{display:none!important}
+#webglOcean{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:1;background:linear-gradient(#78bdd4 0 16%,#4ea0bf 16% 22%,#0b5475 22% 100%)}
+.horizonGlow{position:absolute;left:0;right:0;top:12%;height:12%;background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,0));pointer-events:none;z-index:2}
+#boatScene:before{display:none!important}.hud,.controls,#fishBtn{z-index:20}.speed{z-index:21}
 </style>
 </head>
 <body>
 <div id="app">
-<section id="boatScene" class="scene active"><canvas id="webglOcean" aria-hidden="true"></canvas><div class="horizonGlow" aria-hidden="true"></div><div class="boatWake"></div><div class="playBoat" id="playBoat"><img id="playBoatImg" src="boat_n.png?v=3.4.0" alt="Offshore-Angelboot"></div>
+<section id="boatScene" class="scene active"><canvas id="webglOcean" aria-hidden="true"></canvas><div class="horizonGlow" aria-hidden="true"></div><div class="boatWake"></div><div class="playBoat" id="playBoat"><img id="playBoatImg" src="boat_n.png?v=3.5.0" alt="Offshore-Angelboot"></div>
   <div class="simWorld" id="simWorld" aria-hidden="true">
-    <img class="simOceanPhoto" id="simOceanPhoto" src="simulator_ocean_v22.jpg?v=2.2.0" alt="">
+    <img class="simOceanPhoto" id="simOceanPhoto" src="simulator_ocean_v22.jpg?v=3.5.0" alt="">
     <div class="simWave"></div><div class="simWave w2"></div><div class="simSpray"></div>
   </div>
   <div class="hud" style="left:50%;top:16px;transform:translateX(-50%);font-weight:800;letter-spacing:.08em">OFFSHORE SIMULATOR</div>
   <div class="waveFoam" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
   <div id="goal" class="hud"><div class="label">FREIE FAHRT</div><strong>Fahr, wohin du möchtest</strong><div id="goalText">Zum Angeln anhalten.</div></div>
-  <div class="hud version">V3.4</div>
-  <div id="boat"><div class="wake"></div><img class="realBoat" src="offshore_boat_v20.png?v=2.0.0" alt="Isometrisches Offshore-Angelboot"></div>
+  <div class="hud version">V3.5</div>
+  <div id="boat"><div class="wake"></div><img class="realBoat" src="offshore_boat_v20.png?v=3.5.0" alt="Isometrisches Offshore-Angelboot"></div>
   <div class="controls steer"><button id="leftBtn" class="ctrl">←</button><button id="rightBtn" class="ctrl">→</button></div>
   <div class="controls pedals"><button id="gasBtn" class="ctrl gas">G</button><button id="brakeBtn" class="ctrl brake">B</button></div>
   <div class="hud speed"><span id="speedValue">0</span> km/h</div>
   <button id="fishBtn" class="hidden">🎣 Hier angeln</button>
 </section>
 <section id="fishingScene" class="scene">
-  <div class="hud version">V3.4</div>
+  <div class="hud version">V3.5</div>
   <div class="deckIso"><div class="console"></div><div class="cooler"></div><div class="rods"></div><div class="motor2"></div></div>
   <div id="player" class="player"><div class="head"></div><div class="body"></div><div class="leg l"></div><div class="leg r"></div><div class="shoe l"></div><div class="shoe r"></div></div>
   <div id="joystick" class="joy"><div id="stick" class="stick"></div></div>
@@ -240,114 +246,84 @@ clip-path:polygon(3% 10%,97% 10%,97% 96%,3% 96%)}
 </section>
 </div>
 <script>
+
 (()=>{'use strict';
-const q=id=>document.getElementById(id),boatScene=q('boatScene'),fishingScene=q('fishingScene'),boat=q('boat'),speedValue=q('speedValue'),goalText=q('goalText'),fishBtn=q('fishBtn');const simWorld=q('simWorld'),simOceanPhoto=q('simOceanPhoto'),playBoat=q('playBoat'),playBoatImg=q('playBoatImg');
-const held={left:false,right:false,gas:false,brake:false},state={x:.38,y:.67,angle:20,speed:0};
-const rodHeld={up:false,down:false,left:false,right:false},rodState={x:.74,y:.64};let catchCount=0;
+const q=id=>document.getElementById(id);
+const boatScene=q('boatScene'), fishingScene=q('fishingScene');
+const speedValue=q('speedValue'), goalText=q('goalText'), fishBtn=q('fishBtn');
+const leftBtn=q('leftBtn'), rightBtn=q('rightBtn'), gasBtn=q('gasBtn'), brakeBtn=q('brakeBtn');
+const held={left:false,right:false,gas:false,brake:false};
+const boatState={x:0,z:8,yaw:0,speed:0};
 function hold(el,key){const on=e=>{e.preventDefault();held[key]=true;el.classList.add('pressed');try{el.setPointerCapture(e.pointerId)}catch(_){}};const off=e=>{e.preventDefault();held[key]=false;el.classList.remove('pressed')};el.addEventListener('pointerdown',on);['pointerup','pointercancel','lostpointercapture'].forEach(n=>el.addEventListener(n,off));}
-hold(q('leftBtn'),'left');hold(q('rightBtn'),'right');hold(q('gasBtn'),'gas');hold(q('brakeBtn'),'brake');
-q('leftBtn').addEventListener('click',()=>{state.angle-=45;});
-q('rightBtn').addEventListener('click',()=>{state.angle+=45;});
+hold(leftBtn,'left');hold(rightBtn,'right');hold(gasBtn,'gas');hold(brakeBtn,'brake');
+leftBtn.addEventListener('click',()=>{boatState.yaw-=0.12}); rightBtn.addEventListener('click',()=>{boatState.yaw+=0.12});
+
+const rodHeld={up:false,down:false,left:false,right:false},rodState={x:.74,y:.64};let catchCount=0;
 function rodHold(el,key){const on=e=>{e.preventDefault();rodHeld[key]=true;el.classList.add('pressed');try{el.setPointerCapture(e.pointerId)}catch(_){}};const off=e=>{e.preventDefault();rodHeld[key]=false;el.classList.remove('pressed')};el.addEventListener('pointerdown',on);['pointerup','pointercancel','lostpointercapture'].forEach(n=>el.addEventListener(n,off));}
 rodHold(q('rodUp'),'up');rodHold(q('rodDown'),'down');rodHold(q('rodLeft'),'left');rodHold(q('rodRight'),'right');
 const bobber=q('bobber'),rodLine=q('rodLine'),fishLayer=q('fishLayer'),catchHud=q('catchHud'),catchCountEl=q('catchCount'),fishCountdown=q('fishCountdown');
 let fishes=[],nextFishAt=performance.now()+20000,fishId=0;
-function spawnFish(){
-  const fish={id:++fishId,x:.58+Math.random()*.32,y:.34+Math.random()*.42};
-  const el=document.createElement('div');el.className='fishTarget';el.dataset.fishId=String(fish.id);
-  el.style.left=(fish.x*100)+'%';el.style.top=(fish.y*100)+'%';
-  if(Math.random()>.5)el.style.transform='scaleX(-1)';
-  fish.el=el;fishLayer.appendChild(el);fishes.push(fish);
-}
+function spawnFish(){const fish={id:++fishId,x:.58+Math.random()*.32,y:.34+Math.random()*.42};const el=document.createElement('div');el.className='fishTarget';el.dataset.fishId=String(fish.id);el.style.left=(fish.x*100)+'%';el.style.top=(fish.y*100)+'%';if(Math.random()>.5)el.style.transform='scaleX(-1)';fish.el=el;fishLayer.appendChild(el);fishes.push(fish);}
 spawnFish();
-function switchScene(fishing){boatScene.classList.toggle('active',!fishing);fishingScene.classList.toggle('active',fishing);Object.keys(held).forEach(k=>held[k]=false);Object.keys(rodHeld).forEach(k=>rodHeld[k]=false);if(fishing){nextFishAt=performance.now()+20000;fishCountdown.textContent='20'}}
-fishBtn.addEventListener('click',()=>switchScene(true));q('backBtn').addEventListener('click',()=>switchScene(false));
+function switchScene(fishing){boatScene.classList.toggle('active',!fishing);fishingScene.classList.toggle('active',fishing);Object.keys(held).forEach(k=>held[k]=false);Object.keys(rodHeld).forEach(k=>rodHeld[k]=false);if(fishing){nextFishAt=performance.now()+20000;fishCountdown.textContent='20';} else {catchHud.classList.remove('catchFlash');}}
+fishBtn.addEventListener('click',()=>switchScene(true)); q('backBtn').addEventListener('click',()=>switchScene(false));
 const joystick=q('joystick'),stick=q('stick'),player=q('player'),joy={active:false,id:null,x:0,y:0},ps={x:.5,y:.56};
-function setJoy(x,y){const r=joystick.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;let dx=x-cx,dy=y-cy,max=r.width*.30,l=Math.hypot(dx,dy)||1;if(l>max){dx=dx/l*max;dy=dy/l*max}joy.x=dx/max;joy.y=dy/max;stick.style.transform=`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px))`}
-function resetJoy(){joy.active=false;joy.id=null;joy.x=joy.y=0;stick.style.transform='translate(-50%,-50%)'}
+function setJoy(x,y){const r=joystick.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;let dx=x-cx,dy=y-cy,max=r.width*.30,l=Math.hypot(dx,dy)||1;if(l>max){dx=dx/l*max;dy=dy/l*max}joy.x=dx/max;joy.y=dy/max;stick.style.transform=`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px))`;}
+function resetJoy(){joy.active=false;joy.id=null;joy.x=joy.y=0;stick.style.transform='translate(-50%,-50%)';}
 joystick.addEventListener('pointerdown',e=>{e.preventDefault();joy.active=true;joy.id=e.pointerId;try{joystick.setPointerCapture(e.pointerId)}catch(_){}setJoy(e.clientX,e.clientY)});joystick.addEventListener('pointermove',e=>{if(joy.active&&e.pointerId===joy.id)setJoy(e.clientX,e.clientY)});joystick.addEventListener('pointerup',resetJoy);joystick.addEventListener('pointercancel',resetJoy);
 
-// V3.4 WebGL ocean: actual displaced mesh, no external library/CDN required.
-const oceanCanvas=q('webglOcean');
-let oceanGL=null,oceanProgram=null,oceanPos=null,oceanBase=null,oceanIdx=null,oceanLoc={},oceanReady=false;
-function initOcean(){
-  const gl=oceanCanvas.getContext('webgl',{alpha:false,antialias:true});
-  if(!gl)return;
-  oceanGL=gl;
-  const vs=`attribute vec3 p; uniform mat4 mvp; varying float h; varying float d;
-  void main(){h=p.y;d=p.z;gl_Position=mvp*vec4(p,1.0);}`;
-  const fs=`precision mediump float; varying float h; varying float d;
-  void main(){
-    float crest=smoothstep(.10,.42,h);
-    float depth=clamp((d+4.0)/28.0,0.0,1.0);
-    vec3 deep=vec3(.015,.18,.28), shallow=vec3(.02,.38,.50);
-    vec3 c=mix(shallow,deep,depth);
-    c+=crest*vec3(.28,.38,.40);
-    float glint=pow(max(0.0,1.0-abs(h-.22)*3.2),7.0)*.18;
-    c+=glint;
-    gl_FragColor=vec4(c,1.0);
-  }`;
-  function shader(type,src){let s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(s));return s}
-  let pr=gl.createProgram();gl.attachShader(pr,shader(gl.VERTEX_SHADER,vs));gl.attachShader(pr,shader(gl.FRAGMENT_SHADER,fs));gl.linkProgram(pr);
-  if(!gl.getProgramParameter(pr,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(pr));
-  oceanProgram=pr; gl.useProgram(pr);
-  const NX=54,NZ=70,W=34,D=42,verts=[],base=[],idx=[];
-  for(let z=0;z<=NZ;z++)for(let x=0;x<=NX;x++){let px=(x/NX-.5)*W,pz=(z/NZ)*D-5;verts.push(px,0,pz);base.push(px,0,pz)}
-  for(let z=0;z<NZ;z++)for(let x=0;x<NX;x++){let a=z*(NX+1)+x,b=a+1,c=a+NX+1,d=c+1;idx.push(a,c,b,b,c,d)}
-  oceanPos=new Float32Array(verts);oceanBase=new Float32Array(base);oceanIdx=new Uint16Array(idx);
-  let vb=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,vb);gl.bufferData(gl.ARRAY_BUFFER,oceanPos,gl.DYNAMIC_DRAW);
-  let ib=gl.createBuffer();gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,ib);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,oceanIdx,gl.STATIC_DRAW);
-  let loc=gl.getAttribLocation(pr,'p');gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,3,gl.FLOAT,false,0,0);
-  oceanLoc.mvp=gl.getUniformLocation(pr,'mvp'); oceanLoc.vb=vb;
-  gl.enable(gl.DEPTH_TEST);oceanReady=true;
-}
-function matMul(a,b){let o=new Float32Array(16);for(let r=0;r<4;r++)for(let c=0;c<4;c++)for(let k=0;k<4;k++)o[c*4+r]+=a[k*4+r]*b[c*4+k];return o}
-function perspective(fov,asp,n,f){let t=1/Math.tan(fov/2),o=new Float32Array(16);o[0]=t/asp;o[5]=t;o[10]=(f+n)/(n-f);o[11]=-1;o[14]=2*f*n/(n-f);return o}
-function lookAt(ex,ey,ez,cx,cy,cz){
- let zx=ex-cx,zy=ey-cy,zz=ez-cz,zl=Math.hypot(zx,zy,zz);zx/=zl;zy/=zl;zz/=zl;
- let xx=zz,xz=-zx,xl=Math.hypot(xx,xz);xx/=xl;xz/=xl;
- let yx=zy*xz,yz=-zy*xx;
- return new Float32Array([xx,yx,zx,0,0,Math.hypot(zx,zz),zy,0,xz,yz,zz,0,-(xx*ex+xz*ez),-(yx*ex+Math.hypot(zx,zz)*ey+yz*ez),-(zx*ex+zy*ey+zz*ez),1]);
-}
-function renderOcean(ms){
- if(!oceanReady)return;
- const gl=oceanGL,t=ms*.001,spd=state.speed||0;
- for(let i=0;i<oceanPos.length;i+=3){
-   const x=oceanBase[i],z=oceanBase[i+2];
-   // Four coherent wave trains: broad swell plus smaller wind waves.
-   const w1=Math.sin(x*.34+z*.42-t*.95)*.34;
-   const w2=Math.sin(-x*.48+z*.31-t*1.18+1.7)*.22;
-   const w3=Math.sin(x*.78+z*.67-t*1.55)*.10;
-   const w4=Math.sin(-x*1.05+z*.86-t*1.92)*.055;
-   oceanPos[i+1]=w1+w2+w3+w4;
+// ===== Minimal WebGL engine =====
+const canvas=q('webglOcean');
+const gl=canvas.getContext('webgl',{alpha:false,antialias:true,depth:true,preserveDrawingBuffer:false});
+let ready=false,prog,loc={},ocean,boat;
+const waves=[
+  {a:.45, dx:.96, dz:.28, k:.32, s:1.05, p:0.2},
+  {a:.28, dx:.34, dz:.94, k:.45, s:1.32, p:1.7},
+  {a:.14, dx:-.82, dz:.57, k:.78, s:1.95, p:2.6},
+  {a:.08, dx:.62, dz:-.78, k:1.18, s:2.45, p:0.9},
+];
+function waveSample(x,z,t){let y=0,dx=0,dz=0,ox=x,oz=z;for(const w of waves){const ph=(x*w.dx+z*w.dz)*w.k-t*w.s+w.p;y+=Math.sin(ph)*w.a;const c=Math.cos(ph)*w.a*w.k;dx+=w.dx*c;dz+=w.dz*c;ox+=w.dx*Math.cos(ph)*w.a*.18;oz+=w.dz*Math.cos(ph)*w.a*.18;}return {y,dx,dz,ox,oz};}
+function createProgram(vsSrc,fsSrc){function sh(t,s){const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(o));return o}const p=gl.createProgram();gl.attachShader(p,sh(gl.VERTEX_SHADER,vsSrc));gl.attachShader(p,sh(gl.FRAGMENT_SHADER,fsSrc));gl.linkProgram(p);if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(p));return p;}
+function m4mul(a,b){const o=new Float32Array(16);for(let c=0;c<4;c++)for(let r=0;r<4;r++)o[c*4+r]=a[0*4+r]*b[c*4+0]+a[1*4+r]*b[c*4+1]+a[2*4+r]*b[c*4+2]+a[3*4+r]*b[c*4+3];return o;}
+function m4persp(fovy,asp,n,f){const t=1/Math.tan(fovy/2),o=new Float32Array(16);o[0]=t/asp;o[5]=t;o[10]=(f+n)/(n-f);o[11]=-1;o[14]=2*f*n/(n-f);return o;}
+function v3sub(a,b){return [a[0]-b[0],a[1]-b[1],a[2]-b[2]]} function v3cross(a,b){return [a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]]} function v3norm(v){const l=Math.hypot(v[0],v[1],v[2])||1;return [v[0]/l,v[1]/l,v[2]/l]}
+function m4look(eye,target,up){const z=v3norm(v3sub(eye,target)),x=v3norm(v3cross(up,z)),y=v3cross(z,x);return new Float32Array([x[0],y[0],z[0],0,x[1],y[1],z[1],0,x[2],y[2],z[2],0,-(x[0]*eye[0]+x[1]*eye[1]+x[2]*eye[2]),-(y[0]*eye[0]+y[1]*eye[1]+y[2]*eye[2]),-(z[0]*eye[0]+z[1]*eye[1]+z[2]*eye[2]),1]);}
+function m4identity(){const o=new Float32Array(16);o[0]=o[5]=o[10]=o[15]=1;return o}
+function m4translate(x,y,z){const o=m4identity();o[12]=x;o[13]=y;o[14]=z;return o}
+function m4rotX(a){const c=Math.cos(a),s=Math.sin(a),o=m4identity();o[5]=c;o[6]=s;o[9]=-s;o[10]=c;return o}
+function m4rotY(a){const c=Math.cos(a),s=Math.sin(a),o=m4identity();o[0]=c;o[2]=-s;o[8]=s;o[10]=c;return o}
+function m4rotZ(a){const c=Math.cos(a),s=Math.sin(a),o=m4identity();o[0]=c;o[1]=s;o[4]=-s;o[5]=c;return o}
+function m4scale(x,y,z){const o=m4identity();o[0]=x;o[5]=y;o[10]=z;return o}
+function makeMesh(data, dynamic){const inter=new Float32Array(data);const vb=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,vb);gl.bufferData(gl.ARRAY_BUFFER,inter,dynamic?gl.DYNAMIC_DRAW:gl.STATIC_DRAW);return {vb,count:inter.length/9,data:inter,dynamic};}
+function push(arr,p,n,c){arr.push(p[0],p[1],p[2],n[0],n[1],n[2],c[0],c[1],c[2]);}
+function quad(arr,a,b,c,d,col){const n=v3norm(v3cross(v3sub(b,a),v3sub(c,a)));push(arr,a,n,col);push(arr,b,n,col);push(arr,c,n,col);push(arr,a,n,col);push(arr,c,n,col);push(arr,d,n,col);} 
+function addBox(arr,cx,cy,cz,sx,sy,sz,col){const x=sx/2,y=sy/2,z=sz/2;const p=[[cx-x,cy-y,cz-z],[cx+x,cy-y,cz-z],[cx+x,cy+y,cz-z],[cx-x,cy+y,cz-z],[cx-x,cy-y,cz+z],[cx+x,cy-y,cz+z],[cx+x,cy+y,cz+z],[cx-x,cy+y,cz+z]];quad(arr,p[4],p[5],p[6],p[7],col);quad(arr,p[1],p[0],p[3],p[2],col);quad(arr,p[0],p[4],p[7],p[3],col);quad(arr,p[5],p[1],p[2],p[6],col);quad(arr,p[3],p[7],p[6],p[2],col);quad(arr,p[0],p[1],p[5],p[4],col);} 
+function buildBoat(){const a=[];const navy=[0.05,0.13,0.26],white=[0.96,0.97,0.98],deck=[0.86,0.83,0.78],glass=[0.28,0.45,0.58],metal=[0.72,0.75,0.77];
+ addBox(a,0,0.35,0.15,2.05,0.72,4.1,navy); addBox(a,0,0.47,-1.82,1.15,0.58,1.55,navy); addBox(a,0,0.82,-0.18,1.78,0.13,3.82,white); addBox(a,0,0.9,-0.05,1.34,0.05,3.0,deck);
+ addBox(a,0,1.22,-0.35,1.18,0.62,1.72,white); addBox(a,0,1.36,-0.44,1.03,0.28,0.44,glass); addBox(a,0,1.55,-0.33,0.88,0.10,1.18,white); addBox(a,0,1.9,-0.33,1.02,0.08,1.02,white);
+ const posts=[[-0.38,1.73,0.02], [0.38,1.73,0.02],[-0.38,1.73,-0.68],[0.38,1.73,-0.68]]; for(const p of posts)addBox(a,p[0],p[1],p[2],0.06,0.70,0.06,metal);
+ addBox(a,0,2.18,-0.33,0.22,0.42,0.22,white); addBox(a,0,2.5,-0.33,0.03,0.60,0.03,metal); addBox(a,-0.02,2.12,-0.33,0.54,0.04,0.54,metal);
+ for(const sx of [-.75,-.55,.55,.75]) addBox(a,sx,1.18,1.18,0.03,1.0,0.03,metal);
+ for(const sx of [-.72,-.54,.54,.72]) addBox(a,sx,1.7,1.42,0.02,1.5,0.02,[0.15,0.13,0.11]);
+ return makeMesh(a,false);
  }
- gl.bindBuffer(gl.ARRAY_BUFFER,oceanLoc.vb);gl.bufferSubData(gl.ARRAY_BUFFER,0,oceanPos);
- const dpr=Math.min(devicePixelRatio||1,1.7),w=Math.max(2,Math.floor(oceanCanvas.clientWidth*dpr)),h=Math.max(2,Math.floor(oceanCanvas.clientHeight*dpr));
- if(oceanCanvas.width!==w||oceanCanvas.height!==h){oceanCanvas.width=w;oceanCanvas.height=h}
- gl.viewport(0,0,w,h);gl.clearColor(.28,.61,.72,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
- const proj=perspective(52*Math.PI/180,w/h,.1,100),view=lookAt(0,7.2,-8.8,0,-.25,13);
- gl.useProgram(oceanProgram);gl.uniformMatrix4fv(oceanLoc.mvp,false,matMul(proj,view));
- gl.drawElements(gl.TRIANGLES,oceanIdx.length,gl.UNSIGNED_SHORT,0);
-}
-try{initOcean()}catch(e){console.warn('WebGL ocean fallback',e)}
+ function buildOcean(nx,nz,w,d){const data=new Float32Array((nx+1)*(nz+1)*9);const base=[];let ptr=0;for(let iz=0;iz<=nz;iz++){for(let ix=0;ix<=nx;ix++){const x=(ix/nx-.5)*w,z=(iz/nz)*d-8;base.push(x,z);data[ptr]=x;data[ptr+1]=0;data[ptr+2]=z;data[ptr+3]=0;data[ptr+4]=1;data[ptr+5]=0;data[ptr+6]=0.03;data[ptr+7]=0.34;data[ptr+8]=0.48;ptr+=9;}}const idx=[];for(let iz=0;iz<nz;iz++)for(let ix=0;ix<nx;ix++){const a=iz*(nx+1)+ix,b=a+1,c=a+nx+1,dv=c+1;idx.push(a,c,b,b,c,dv)}const vb=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,vb);gl.bufferData(gl.ARRAY_BUFFER,data,gl.DYNAMIC_DRAW);const ib=gl.createBuffer();gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,ib);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint16Array(idx),gl.STATIC_DRAW);return {vb,ib,count:idx.length,data,base,nx,nz}; }
+ function init3D(){if(!gl)return; const vs=`attribute vec3 aPos; attribute vec3 aNor; attribute vec3 aCol; uniform mat4 uMVP; uniform mat4 uModel; uniform float uWater; varying vec3 vCol; varying vec3 vNor; varying float vWater; varying float vY; void main(){ vec4 wp=uModel*vec4(aPos,1.0); vNor=normalize((uModel*vec4(aNor,0.0)).xyz); vCol=aCol; vWater=uWater; vY=wp.y; gl_Position=uMVP*vec4(aPos,1.0);} `;
+ const fs=`precision mediump float; varying vec3 vCol; varying vec3 vNor; varying float vWater; varying float vY; void main(){ vec3 n=normalize(vNor); vec3 l=normalize(vec3(0.35,0.95,0.22)); float diff=max(dot(n,l),0.0); float spec=pow(max(dot(reflect(-l,n),normalize(vec3(0.0,0.85,0.55))),0.0),18.0); vec3 col=vCol; if(vWater>0.5){ float crest=smoothstep(0.18,0.55,vY); col=mix(vec3(0.02,0.21,0.31),vec3(0.03,0.42,0.58),0.45+vY*0.28); col+=crest*vec3(0.18,0.24,0.25);} vec3 lit=col*(0.38+diff*0.82)+spec*(vWater>0.5?0.20:0.08); gl_FragColor=vec4(lit,1.0);} `;
+ prog=createProgram(vs,fs); gl.useProgram(prog); loc.pos=gl.getAttribLocation(prog,'aPos'); loc.nor=gl.getAttribLocation(prog,'aNor'); loc.col=gl.getAttribLocation(prog,'aCol'); loc.mvp=gl.getUniformLocation(prog,'uMVP'); loc.model=gl.getUniformLocation(prog,'uModel'); loc.water=gl.getUniformLocation(prog,'uWater');
+ boat=buildBoat(); ocean=buildOcean(84,92,52,78); gl.enable(gl.DEPTH_TEST); ready=true; }
+ function bindMesh(mesh,indexed){gl.bindBuffer(gl.ARRAY_BUFFER,mesh.vb);gl.enableVertexAttribArray(loc.pos);gl.vertexAttribPointer(loc.pos,3,gl.FLOAT,false,36,0);gl.enableVertexAttribArray(loc.nor);gl.vertexAttribPointer(loc.nor,3,gl.FLOAT,false,36,12);gl.enableVertexAttribArray(loc.col);gl.vertexAttribPointer(loc.col,3,gl.FLOAT,false,36,24); if(indexed)gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,mesh.ib);} 
+ function updateOcean(t){const d=ocean.data,b=ocean.base;let ptr=0;for(let i=0;i<b.length;i+=2){const s=waveSample(b[i],b[i+1],t);const nx=-s.dx, nz=-s.dz, inv=1/Math.hypot(nx,1,nz);d[ptr]=s.ox; d[ptr+1]=s.y; d[ptr+2]=s.oz; d[ptr+3]=nx*inv; d[ptr+4]=1*inv; d[ptr+5]=nz*inv; d[ptr+6]=0.02; d[ptr+7]=0.34+Math.max(0,s.y)*0.08; d[ptr+8]=0.48+Math.max(0,s.y)*0.10; ptr+=9;} gl.bindBuffer(gl.ARRAY_BUFFER,ocean.vb); gl.bufferSubData(gl.ARRAY_BUFFER,0,d); }
+ function drawMesh(mesh,model,vp,isWater,indexed){const mvp=m4mul(vp,model); gl.uniformMatrix4fv(loc.mvp,false,mvp); gl.uniformMatrix4fv(loc.model,false,model); gl.uniform1f(loc.water,isWater?1:0); bindMesh(mesh,indexed); if(indexed) gl.drawElements(gl.TRIANGLES,mesh.count,gl.UNSIGNED_SHORT,0); else gl.drawArrays(gl.TRIANGLES,0,mesh.count); }
+ function resizeCanvas(){const dpr=Math.min(window.devicePixelRatio||1,2);const w=Math.max(2,Math.floor(canvas.clientWidth*dpr)),h=Math.max(2,Math.floor(canvas.clientHeight*dpr)); if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;} gl.viewport(0,0,w,h); return [w,h]; }
+ function render3D(now){ if(!gl||!ready) return; const t=now*0.001; const [w,h]=resizeCanvas(); updateOcean(t); gl.clearColor(0.40,0.69,0.82,1); gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT); const sC=waveSample(boatState.x,boatState.z,t), sB=waveSample(boatState.x+Math.sin(boatState.yaw)*2.2,boatState.z-Math.cos(boatState.yaw)*2.2,t), sS=waveSample(boatState.x-Math.sin(boatState.yaw)*2.0,boatState.z+Math.cos(boatState.yaw)*2.0,t), sP=waveSample(boatState.x-Math.cos(boatState.yaw)*1.1,boatState.z-Math.sin(boatState.yaw)*1.1,t), sT=waveSample(boatState.x+Math.cos(boatState.yaw)*1.1,boatState.z+Math.sin(boatState.yaw)*1.1,t); const pitch=Math.atan2(sB.y-sS.y,4.2)*0.8; const roll=Math.atan2(sT.y-sP.y,2.2)*0.9; const boatY=sC.y+0.45; const camDist=9.8, camHeight=4.9; const eye=[boatState.x-Math.sin(boatState.yaw)*camDist, boatY+camHeight, boatState.z+Math.cos(boatState.yaw)*camDist]; const target=[boatState.x, boatY+1.0, boatState.z-0.3]; const vp=m4mul(m4persp(Math.PI/3,w/h,0.1,140), m4look(eye,target,[0,1,0])); drawMesh(ocean,m4identity(),vp,true,true); let model=m4mul(m4translate(boatState.x,boatY,boatState.z), m4mul(m4rotY(boatState.yaw), m4mul(m4rotZ(roll), m4mul(m4rotX(pitch), m4scale(0.85,0.85,0.85))))); drawMesh(boat,model,vp,false,false); }
+ try{init3D()}catch(e){console.warn('init3D failed',e)}
 
-let last=performance.now();function loop(now){const dt=Math.min(.035,(now-last)/1000);last=now;if(boatScene.classList.contains('active')){renderOcean(now);if(held.gas)state.speed+=.30*dt;else state.speed-=.07*dt;if(held.brake)state.speed-=.65*dt;state.speed=Math.max(0,Math.min(.32,state.speed));const turn=(.35+state.speed*2.6)*dt;if(held.left)state.angle-=90*turn;if(held.right)state.angle+=90*turn;const r=state.angle*Math.PI/180;
-const normAngle=((state.angle%360)+360)%360,dirNames=['n','ne','e','se','s','sw','w','nw'],dirName=dirNames[Math.round(normAngle/45)%8];
-if(playBoatImg.dataset.dir!==dirName){playBoatImg.src=`boat_${dirName}.png?v=3.4.0`;playBoatImg.dataset.dir=dirName;}
-const boatBob=Math.sin(now/980)*3.2+Math.sin(now/1730)*1.4;
-playBoat.style.transform=`translate(-50%,-50%) translateY(${boatBob}px) rotate(${boatLean}deg)`;
-boatScene.classList.toggle('movingBoat',state.speed>.025);
-if(oceanTexture){const waterFlow=state.speed*now*.18;oceanTexture.style.backgroundPosition=`${Math.sin(r)*waterFlow}px ${Math.cos(r)*waterFlow}px,${-Math.sin(r)*waterFlow*.7}px ${-Math.cos(r)*waterFlow*.7}px,0 0`;}state.x+=Math.sin(r)*state.speed*dt*.39;state.y-=Math.cos(r)*state.speed*dt*.39;state.x=Math.max(.08,Math.min(.92,state.x));state.y=Math.max(.15,Math.min(.9,state.y));boat.style.left=state.x*100+'%';boat.style.top=state.y*100+'%';boat.style.transform=`translate(-50%,-50%) rotate(${state.angle}deg)`;boat.classList.toggle('moving',state.speed>.03);speedValue.textContent=Math.round(state.speed/.32*35);
-const visualV=state.speed/.32,visualT=now/1000,steerVisual=(held.left?-1:0)+(held.right?1:0);
-const bob=Math.sin(visualT*2.15)*(1.1+visualV*2.1),roll=Math.sin(visualT*1.28)*.25+steerVisual*1.1,travel=(visualT*state.speed*115)%220;
-simOceanPhoto.style.transform=`translate3d(${Math.sin(r)*travel*.20}px,${travel*.08+bob}px,0) scale(${1.04+visualV*.045}) rotate(${roll*.10}deg)`;
-simWorld.style.transform=`translateY(${bob*.42}px) rotate(${roll*.10}deg)`;
-boatScene.classList.toggle('movingSea',state.speed>.03);
-const stopped=state.speed<.025;if(stopped){goalText.textContent='Hier kannst du angeln.';fishBtn.classList.remove('hidden')}else{goalText.textContent='Fahr, wohin du möchtest. Zum Angeln anhalten.';fishBtn.classList.add('hidden')}}
-if(fishingScene.classList.contains('active')){const m=Math.hypot(joy.x,joy.y);if(m>.08){ps.x+=joy.x*.17*dt;ps.y+=joy.y*.17*dt;ps.x=Math.max(.34,Math.min(.66,ps.x));ps.y=Math.max(.33,Math.min(.72,ps.y));player.style.left=ps.x*100+'%';player.style.top=ps.y*100+'%';player.style.transform=`translate(-50%,-50%) rotate(${joy.x*6}deg)`}
-const rs=.22*dt;if(rodHeld.up)rodState.y-=rs;if(rodHeld.down)rodState.y+=rs;if(rodHeld.left)rodState.x-=rs;if(rodHeld.right)rodState.x+=rs;rodState.x=Math.max(.56,Math.min(.92,rodState.x));rodState.y=Math.max(.30,Math.min(.82,rodState.y));bobber.style.left=(rodState.x*100)+'%';bobber.style.top=(rodState.y*100)+'%';const anchorX=.58,anchorY=.46,dx=(rodState.x-anchorX)*innerWidth,dy=(rodState.y-anchorY)*innerHeight,len=Math.hypot(dx,dy),ang=Math.atan2(dx,dy)*180/Math.PI;rodLine.style.height=Math.max(30,len)+'px';rodLine.style.transform=`rotate(${-ang}deg)`;
-const remain=Math.max(0,Math.ceil((nextFishAt-now)/1000));fishCountdown.textContent=String(remain);if(now>=nextFishAt){spawnFish();nextFishAt=now+20000;}
-for(let i=fishes.length-1;i>=0;i--){const f=fishes[i];if(Math.hypot(rodState.x-f.x,rodState.y-f.y)<.045){catchCount++;catchCountEl.textContent=catchCount;catchHud.classList.remove('catchFlash');void catchHud.offsetWidth;catchHud.classList.add('catchFlash');f.el.remove();fishes.splice(i,1);}}}requestAnimationFrame(loop)}requestAnimationFrame(loop);
+ let last=performance.now();
+ function loop(now){const dt=Math.min(.033,(now-last)/1000); last=now; if(boatScene.classList.contains('active')){ if(held.gas) boatState.speed+=0.23*dt; else boatState.speed-=0.045*dt; if(held.brake) boatState.speed-=0.52*dt; boatState.speed=Math.max(0,Math.min(.33,boatState.speed)); const steer=(0.8+boatState.speed*2.0)*dt; if(held.left) boatState.yaw-=steer; if(held.right) boatState.yaw+=steer; const dx=Math.sin(boatState.yaw), dz=-Math.cos(boatState.yaw); boatState.x+=dx*boatState.speed*12*dt; boatState.z+=dz*boatState.speed*12*dt; boatState.x=Math.max(-18,Math.min(18,boatState.x)); boatState.z=Math.max(-2,Math.min(30,boatState.z)); speedValue.textContent=Math.round(boatState.speed/.33*38); if(boatState.speed<.02){ goalText.textContent='Hier kannst du angeln.'; fishBtn.classList.remove('hidden'); } else { goalText.textContent='Fahr, wohin du möchtest. Zum Angeln anhalten.'; fishBtn.classList.add('hidden'); } render3D(now); }
+ if(fishingScene.classList.contains('active')){ const m=Math.hypot(joy.x,joy.y); if(m>.08){ps.x+=joy.x*.17*dt;ps.y+=joy.y*.17*dt;ps.x=Math.max(.34,Math.min(.66,ps.x));ps.y=Math.max(.33,Math.min(.72,ps.y));player.style.left=ps.x*100+'%';player.style.top=ps.y*100+'%';player.style.transform=`translate(-50%,-50%) rotate(${joy.x*6}deg)`;} const rs=.22*dt; if(rodHeld.up)rodState.y-=rs; if(rodHeld.down)rodState.y+=rs; if(rodHeld.left)rodState.x-=rs; if(rodHeld.right)rodState.x+=rs; rodState.x=Math.max(.56,Math.min(.92,rodState.x)); rodState.y=Math.max(.30,Math.min(.82,rodState.y)); bobber.style.left=(rodState.x*100)+'%'; bobber.style.top=(rodState.y*100)+'%'; const anchorX=.58,anchorY=.46,dx=(rodState.x-anchorX)*innerWidth,dy=(rodState.y-anchorY)*innerHeight,len=Math.hypot(dx,dy),ang=Math.atan2(dx,dy)*180/Math.PI; rodLine.style.height=Math.max(30,len)+'px'; rodLine.style.transform=`rotate(${-ang}deg)`; const remain=Math.max(0,Math.ceil((nextFishAt-now)/1000)); fishCountdown.textContent=String(remain); if(now>=nextFishAt){spawnFish(); nextFishAt=now+20000;} for(let i=fishes.length-1;i>=0;i--){const f=fishes[i]; if(Math.hypot(rodState.x-f.x,rodState.y-f.y)<.045){ catchCount++; catchCountEl.textContent=catchCount; catchHud.classList.remove('catchFlash'); void catchHud.offsetWidth; catchHud.classList.add('catchFlash'); f.el.remove(); fishes.splice(i,1); } }} requestAnimationFrame(loop);} requestAnimationFrame(loop);
+ window.addEventListener('resize',()=>{if(gl&&ready)render3D(performance.now())});
 })();
+
 </script>
 </body></html>
