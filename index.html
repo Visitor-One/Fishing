@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#0b4f69">
-<meta name="app-version" content="3.1.0">
+<meta name="app-version" content="3.2.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<title>Fishing Adventures V3.1</title>
+<title>Fishing Adventures V3.2</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#0b5870;color:#fff}button{font:inherit;color:inherit;border:0;touch-action:none}#app,.scene{position:absolute;inset:0;overflow:hidden}.scene{display:none}.scene.active{display:block}
 #boatScene{background:linear-gradient(#66b8c8 0 8%,#177394 8% 100%)}#boatScene:before{content:"";position:absolute;inset:8% 0 0;background:repeating-linear-gradient(165deg,rgba(255,255,255,.11) 0 2px,transparent 2px 22px),repeating-linear-gradient(15deg,rgba(255,255,255,.05) 0 1px,transparent 1px 30px)}
@@ -138,11 +138,36 @@ clip-path:polygon(3% 10%,97% 10%,97% 96%,3% 96%)}
 @keyframes seaFoam{to{background-position:420px 170px}}
 #boatScene.movingBoat .oceanTexture{animation-duration:2.9s!important}
 
+
+/* V3.2 – sichtbar bewegte Wellen; Animation unabhängig vom Fahr-JavaScript */
+.waveLayer{position:absolute;inset:-25%;pointer-events:none;transform-origin:center;will-change:transform;z-index:2}
+.waveA{
+ background:repeating-radial-gradient(ellipse 150px 34px at 50% 50%,transparent 0 60%,rgba(232,250,255,.72) 62% 64%,rgba(255,255,255,.18) 66%,transparent 69% 100%);
+ background-size:300px 105px;opacity:.72;filter:blur(.25px);
+ animation:waveDriftA 4.2s linear infinite;
+}
+.waveB{
+ background:repeating-radial-gradient(ellipse 115px 26px at 50% 50%,transparent 0 61%,rgba(177,229,242,.55) 63% 66%,transparent 69% 100%);
+ background-size:245px 82px;opacity:.65;
+ animation:waveDriftB 6.4s linear infinite;
+}
+.waveC{
+ background:repeating-linear-gradient(168deg,transparent 0 48px,rgba(255,255,255,.34) 50px 52px,transparent 54px 112px);
+ background-size:430px 180px;opacity:.48;filter:blur(.45px);
+ animation:waveDriftC 8.6s linear infinite;
+}
+@keyframes waveDriftA{0%{transform:translate3d(-120px,-55px,0) skewY(-2deg)}100%{transform:translate3d(180px,50px,0) skewY(-2deg)}}
+@keyframes waveDriftB{0%{transform:translate3d(130px,-35px,0) scale(1.04)}100%{transform:translate3d(-150px,70px,0) scale(1.04)}}
+@keyframes waveDriftC{0%{transform:translate3d(-160px,-20px,0)}100%{transform:translate3d(170px,90px,0)}}
+#boatScene.movingBoat .waveA{animation-duration:2.2s}
+#boatScene.movingBoat .waveB{animation-duration:3.3s}
+#boatScene.movingBoat .waveC{animation-duration:4.4s}
+
 </style>
 </head>
 <body>
 <div id="app">
-<section id="boatScene" class="scene active"><div class="oceanWorld" aria-hidden="true"><div class="oceanTexture" id="oceanTexture"></div></div><div class="boatWake"></div><div class="playBoat" id="playBoat"><img id="playBoatImg" src="boat_n.png?v=3.1.0" alt="Offshore-Angelboot"></div>
+<section id="boatScene" class="scene active"><div class="oceanWorld" aria-hidden="true"><div class="oceanTexture" id="oceanTexture"></div><div class="waveLayer waveA"></div><div class="waveLayer waveB"></div><div class="waveLayer waveC"></div></div><div class="boatWake"></div><div class="playBoat" id="playBoat"><img id="playBoatImg" src="boat_n.png?v=3.2.0" alt="Offshore-Angelboot"></div>
   <div class="simWorld" id="simWorld" aria-hidden="true">
     <img class="simOceanPhoto" id="simOceanPhoto" src="simulator_ocean_v22.jpg?v=2.2.0" alt="">
     <div class="simWave"></div><div class="simWave w2"></div><div class="simSpray"></div>
@@ -150,7 +175,7 @@ clip-path:polygon(3% 10%,97% 10%,97% 96%,3% 96%)}
   <div class="hud" style="left:50%;top:16px;transform:translateX(-50%);font-weight:800;letter-spacing:.08em">OFFSHORE SIMULATOR</div>
   <div class="waveFoam" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
   <div id="goal" class="hud"><div class="label">FREIE FAHRT</div><strong>Fahr, wohin du möchtest</strong><div id="goalText">Zum Angeln anhalten.</div></div>
-  <div class="hud version">V3.1</div>
+  <div class="hud version">V3.2</div>
   <div id="boat"><div class="wake"></div><img class="realBoat" src="offshore_boat_v20.png?v=2.0.0" alt="Isometrisches Offshore-Angelboot"></div>
   <div class="controls steer"><button id="leftBtn" class="ctrl">←</button><button id="rightBtn" class="ctrl">→</button></div>
   <div class="controls pedals"><button id="gasBtn" class="ctrl gas">G</button><button id="brakeBtn" class="ctrl brake">B</button></div>
@@ -158,7 +183,7 @@ clip-path:polygon(3% 10%,97% 10%,97% 96%,3% 96%)}
   <button id="fishBtn" class="hidden">🎣 Hier angeln</button>
 </section>
 <section id="fishingScene" class="scene">
-  <div class="hud version">V3.1</div>
+  <div class="hud version">V3.2</div>
   <div class="deckIso"><div class="console"></div><div class="cooler"></div><div class="rods"></div><div class="motor2"></div></div>
   <div id="player" class="player"><div class="head"></div><div class="body"></div><div class="leg l"></div><div class="leg r"></div><div class="shoe l"></div><div class="shoe r"></div></div>
   <div id="joystick" class="joy"><div id="stick" class="stick"></div></div>
@@ -203,7 +228,7 @@ function resetJoy(){joy.active=false;joy.id=null;joy.x=joy.y=0;stick.style.trans
 joystick.addEventListener('pointerdown',e=>{e.preventDefault();joy.active=true;joy.id=e.pointerId;try{joystick.setPointerCapture(e.pointerId)}catch(_){}setJoy(e.clientX,e.clientY)});joystick.addEventListener('pointermove',e=>{if(joy.active&&e.pointerId===joy.id)setJoy(e.clientX,e.clientY)});joystick.addEventListener('pointerup',resetJoy);joystick.addEventListener('pointercancel',resetJoy);
 let last=performance.now();function loop(now){const dt=Math.min(.035,(now-last)/1000);last=now;if(boatScene.classList.contains('active')){if(held.gas)state.speed+=.30*dt;else state.speed-=.07*dt;if(held.brake)state.speed-=.65*dt;state.speed=Math.max(0,Math.min(.32,state.speed));const turn=(.35+state.speed*2.6)*dt;if(held.left)state.angle-=90*turn;if(held.right)state.angle+=90*turn;const r=state.angle*Math.PI/180;
 const normAngle=((state.angle%360)+360)%360,dirNames=['n','ne','e','se','s','sw','w','nw'],dirName=dirNames[Math.round(normAngle/45)%8];
-if(playBoatImg.dataset.dir!==dirName){playBoatImg.src=`boat_${dirName}.png?v=3.1.0`;playBoatImg.dataset.dir=dirName;}
+if(playBoatImg.dataset.dir!==dirName){playBoatImg.src=`boat_${dirName}.png?v=3.2.0`;playBoatImg.dataset.dir=dirName;}
 const boatBob=Math.sin(now/360)*(2.6+state.speed*9)+Math.sin(now/710)*1.4,boatLean=(held.left?-4.5:0)+(held.right?4.5:0)+Math.sin(now/950)*.7;
 playBoat.style.transform=`translate(-50%,-50%) translateY(${boatBob}px) rotate(${boatLean}deg)`;
 boatScene.classList.toggle('movingBoat',state.speed>.025);
