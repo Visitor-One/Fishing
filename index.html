@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#0b4f69">
-<meta name="app-version" content="3.3.0">
+<meta name="app-version" content="3.4.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<title>Fishing Adventures V3.3</title>
+<title>Fishing Adventures V3.4</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#0b5870;color:#fff}button{font:inherit;color:inherit;border:0;touch-action:none}#app,.scene{position:absolute;inset:0;overflow:hidden}.scene{display:none}.scene.active{display:block}
 #boatScene{background:linear-gradient(#66b8c8 0 8%,#177394 8% 100%)}#boatScene:before{content:"";position:absolute;inset:8% 0 0;background:repeating-linear-gradient(165deg,rgba(255,255,255,.11) 0 2px,transparent 2px 22px),repeating-linear-gradient(15deg,rgba(255,255,255,.05) 0 1px,transparent 1px 30px)}
@@ -196,11 +196,18 @@ clip-path:polygon(3% 10%,97% 10%,97% 96%,3% 96%)}
 #boatScene.movingBoat .swellFar{animation-duration:6.1s}
 #boatScene.movingBoat .swellNear{animation-duration:4.9s}
 
+
+/* V3.4 – echtes WebGL-Meer mit animierter Gerstner-artiger Geometrie */
+.oceanWorld,.oceanTexture,.swell,.sunGlint,.waveLayer{display:none!important}
+#webglOcean{position:absolute;inset:0;width:100%;height:100%;z-index:1;display:block;background:linear-gradient(#75b9d0 0 17%,#0b5d7e 17% 100%)}
+.horizonGlow{position:absolute;left:0;right:0;top:14%;height:16%;z-index:2;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,.12),transparent 70%)}
+.playBoat{z-index:12!important}.boatWake{z-index:10!important}
+
 </style>
 </head>
 <body>
 <div id="app">
-<section id="boatScene" class="scene active"><div class="oceanWorld" aria-hidden="true"><div class="oceanTexture" id="oceanTexture"></div><div class="swell swellFar"></div><div class="swell swellNear"></div><div class="sunGlint"></div></div><div class="boatWake"></div><div class="playBoat" id="playBoat"><img id="playBoatImg" src="boat_n.png?v=3.3.0" alt="Offshore-Angelboot"></div>
+<section id="boatScene" class="scene active"><canvas id="webglOcean" aria-hidden="true"></canvas><div class="horizonGlow" aria-hidden="true"></div><div class="boatWake"></div><div class="playBoat" id="playBoat"><img id="playBoatImg" src="boat_n.png?v=3.4.0" alt="Offshore-Angelboot"></div>
   <div class="simWorld" id="simWorld" aria-hidden="true">
     <img class="simOceanPhoto" id="simOceanPhoto" src="simulator_ocean_v22.jpg?v=2.2.0" alt="">
     <div class="simWave"></div><div class="simWave w2"></div><div class="simSpray"></div>
@@ -208,7 +215,7 @@ clip-path:polygon(3% 10%,97% 10%,97% 96%,3% 96%)}
   <div class="hud" style="left:50%;top:16px;transform:translateX(-50%);font-weight:800;letter-spacing:.08em">OFFSHORE SIMULATOR</div>
   <div class="waveFoam" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
   <div id="goal" class="hud"><div class="label">FREIE FAHRT</div><strong>Fahr, wohin du möchtest</strong><div id="goalText">Zum Angeln anhalten.</div></div>
-  <div class="hud version">V3.3</div>
+  <div class="hud version">V3.4</div>
   <div id="boat"><div class="wake"></div><img class="realBoat" src="offshore_boat_v20.png?v=2.0.0" alt="Isometrisches Offshore-Angelboot"></div>
   <div class="controls steer"><button id="leftBtn" class="ctrl">←</button><button id="rightBtn" class="ctrl">→</button></div>
   <div class="controls pedals"><button id="gasBtn" class="ctrl gas">G</button><button id="brakeBtn" class="ctrl brake">B</button></div>
@@ -216,7 +223,7 @@ clip-path:polygon(3% 10%,97% 10%,97% 96%,3% 96%)}
   <button id="fishBtn" class="hidden">🎣 Hier angeln</button>
 </section>
 <section id="fishingScene" class="scene">
-  <div class="hud version">V3.3</div>
+  <div class="hud version">V3.4</div>
   <div class="deckIso"><div class="console"></div><div class="cooler"></div><div class="rods"></div><div class="motor2"></div></div>
   <div id="player" class="player"><div class="head"></div><div class="body"></div><div class="leg l"></div><div class="leg r"></div><div class="shoe l"></div><div class="shoe r"></div></div>
   <div id="joystick" class="joy"><div id="stick" class="stick"></div></div>
@@ -234,7 +241,7 @@ clip-path:polygon(3% 10%,97% 10%,97% 96%,3% 96%)}
 </div>
 <script>
 (()=>{'use strict';
-const q=id=>document.getElementById(id),boatScene=q('boatScene'),fishingScene=q('fishingScene'),boat=q('boat'),speedValue=q('speedValue'),goalText=q('goalText'),fishBtn=q('fishBtn');const simWorld=q('simWorld'),simOceanPhoto=q('simOceanPhoto'),playBoat=q('playBoat'),playBoatImg=q('playBoatImg'),oceanTexture=q('oceanTexture');
+const q=id=>document.getElementById(id),boatScene=q('boatScene'),fishingScene=q('fishingScene'),boat=q('boat'),speedValue=q('speedValue'),goalText=q('goalText'),fishBtn=q('fishBtn');const simWorld=q('simWorld'),simOceanPhoto=q('simOceanPhoto'),playBoat=q('playBoat'),playBoatImg=q('playBoatImg');
 const held={left:false,right:false,gas:false,brake:false},state={x:.38,y:.67,angle:20,speed:0};
 const rodHeld={up:false,down:false,left:false,right:false},rodState={x:.74,y:.64};let catchCount=0;
 function hold(el,key){const on=e=>{e.preventDefault();held[key]=true;el.classList.add('pressed');try{el.setPointerCapture(e.pointerId)}catch(_){}};const off=e=>{e.preventDefault();held[key]=false;el.classList.remove('pressed')};el.addEventListener('pointerdown',on);['pointerup','pointercancel','lostpointercapture'].forEach(n=>el.addEventListener(n,off));}
@@ -259,9 +266,74 @@ const joystick=q('joystick'),stick=q('stick'),player=q('player'),joy={active:fal
 function setJoy(x,y){const r=joystick.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;let dx=x-cx,dy=y-cy,max=r.width*.30,l=Math.hypot(dx,dy)||1;if(l>max){dx=dx/l*max;dy=dy/l*max}joy.x=dx/max;joy.y=dy/max;stick.style.transform=`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px))`}
 function resetJoy(){joy.active=false;joy.id=null;joy.x=joy.y=0;stick.style.transform='translate(-50%,-50%)'}
 joystick.addEventListener('pointerdown',e=>{e.preventDefault();joy.active=true;joy.id=e.pointerId;try{joystick.setPointerCapture(e.pointerId)}catch(_){}setJoy(e.clientX,e.clientY)});joystick.addEventListener('pointermove',e=>{if(joy.active&&e.pointerId===joy.id)setJoy(e.clientX,e.clientY)});joystick.addEventListener('pointerup',resetJoy);joystick.addEventListener('pointercancel',resetJoy);
-let last=performance.now();function loop(now){const dt=Math.min(.035,(now-last)/1000);last=now;if(boatScene.classList.contains('active')){if(held.gas)state.speed+=.30*dt;else state.speed-=.07*dt;if(held.brake)state.speed-=.65*dt;state.speed=Math.max(0,Math.min(.32,state.speed));const turn=(.35+state.speed*2.6)*dt;if(held.left)state.angle-=90*turn;if(held.right)state.angle+=90*turn;const r=state.angle*Math.PI/180;
+
+// V3.4 WebGL ocean: actual displaced mesh, no external library/CDN required.
+const oceanCanvas=q('webglOcean');
+let oceanGL=null,oceanProgram=null,oceanPos=null,oceanBase=null,oceanIdx=null,oceanLoc={},oceanReady=false;
+function initOcean(){
+  const gl=oceanCanvas.getContext('webgl',{alpha:false,antialias:true});
+  if(!gl)return;
+  oceanGL=gl;
+  const vs=`attribute vec3 p; uniform mat4 mvp; varying float h; varying float d;
+  void main(){h=p.y;d=p.z;gl_Position=mvp*vec4(p,1.0);}`;
+  const fs=`precision mediump float; varying float h; varying float d;
+  void main(){
+    float crest=smoothstep(.10,.42,h);
+    float depth=clamp((d+4.0)/28.0,0.0,1.0);
+    vec3 deep=vec3(.015,.18,.28), shallow=vec3(.02,.38,.50);
+    vec3 c=mix(shallow,deep,depth);
+    c+=crest*vec3(.28,.38,.40);
+    float glint=pow(max(0.0,1.0-abs(h-.22)*3.2),7.0)*.18;
+    c+=glint;
+    gl_FragColor=vec4(c,1.0);
+  }`;
+  function shader(type,src){let s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(s));return s}
+  let pr=gl.createProgram();gl.attachShader(pr,shader(gl.VERTEX_SHADER,vs));gl.attachShader(pr,shader(gl.FRAGMENT_SHADER,fs));gl.linkProgram(pr);
+  if(!gl.getProgramParameter(pr,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(pr));
+  oceanProgram=pr; gl.useProgram(pr);
+  const NX=54,NZ=70,W=34,D=42,verts=[],base=[],idx=[];
+  for(let z=0;z<=NZ;z++)for(let x=0;x<=NX;x++){let px=(x/NX-.5)*W,pz=(z/NZ)*D-5;verts.push(px,0,pz);base.push(px,0,pz)}
+  for(let z=0;z<NZ;z++)for(let x=0;x<NX;x++){let a=z*(NX+1)+x,b=a+1,c=a+NX+1,d=c+1;idx.push(a,c,b,b,c,d)}
+  oceanPos=new Float32Array(verts);oceanBase=new Float32Array(base);oceanIdx=new Uint16Array(idx);
+  let vb=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,vb);gl.bufferData(gl.ARRAY_BUFFER,oceanPos,gl.DYNAMIC_DRAW);
+  let ib=gl.createBuffer();gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,ib);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,oceanIdx,gl.STATIC_DRAW);
+  let loc=gl.getAttribLocation(pr,'p');gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,3,gl.FLOAT,false,0,0);
+  oceanLoc.mvp=gl.getUniformLocation(pr,'mvp'); oceanLoc.vb=vb;
+  gl.enable(gl.DEPTH_TEST);oceanReady=true;
+}
+function matMul(a,b){let o=new Float32Array(16);for(let r=0;r<4;r++)for(let c=0;c<4;c++)for(let k=0;k<4;k++)o[c*4+r]+=a[k*4+r]*b[c*4+k];return o}
+function perspective(fov,asp,n,f){let t=1/Math.tan(fov/2),o=new Float32Array(16);o[0]=t/asp;o[5]=t;o[10]=(f+n)/(n-f);o[11]=-1;o[14]=2*f*n/(n-f);return o}
+function lookAt(ex,ey,ez,cx,cy,cz){
+ let zx=ex-cx,zy=ey-cy,zz=ez-cz,zl=Math.hypot(zx,zy,zz);zx/=zl;zy/=zl;zz/=zl;
+ let xx=zz,xz=-zx,xl=Math.hypot(xx,xz);xx/=xl;xz/=xl;
+ let yx=zy*xz,yz=-zy*xx;
+ return new Float32Array([xx,yx,zx,0,0,Math.hypot(zx,zz),zy,0,xz,yz,zz,0,-(xx*ex+xz*ez),-(yx*ex+Math.hypot(zx,zz)*ey+yz*ez),-(zx*ex+zy*ey+zz*ez),1]);
+}
+function renderOcean(ms){
+ if(!oceanReady)return;
+ const gl=oceanGL,t=ms*.001,spd=state.speed||0;
+ for(let i=0;i<oceanPos.length;i+=3){
+   const x=oceanBase[i],z=oceanBase[i+2];
+   // Four coherent wave trains: broad swell plus smaller wind waves.
+   const w1=Math.sin(x*.34+z*.42-t*.95)*.34;
+   const w2=Math.sin(-x*.48+z*.31-t*1.18+1.7)*.22;
+   const w3=Math.sin(x*.78+z*.67-t*1.55)*.10;
+   const w4=Math.sin(-x*1.05+z*.86-t*1.92)*.055;
+   oceanPos[i+1]=w1+w2+w3+w4;
+ }
+ gl.bindBuffer(gl.ARRAY_BUFFER,oceanLoc.vb);gl.bufferSubData(gl.ARRAY_BUFFER,0,oceanPos);
+ const dpr=Math.min(devicePixelRatio||1,1.7),w=Math.max(2,Math.floor(oceanCanvas.clientWidth*dpr)),h=Math.max(2,Math.floor(oceanCanvas.clientHeight*dpr));
+ if(oceanCanvas.width!==w||oceanCanvas.height!==h){oceanCanvas.width=w;oceanCanvas.height=h}
+ gl.viewport(0,0,w,h);gl.clearColor(.28,.61,.72,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+ const proj=perspective(52*Math.PI/180,w/h,.1,100),view=lookAt(0,7.2,-8.8,0,-.25,13);
+ gl.useProgram(oceanProgram);gl.uniformMatrix4fv(oceanLoc.mvp,false,matMul(proj,view));
+ gl.drawElements(gl.TRIANGLES,oceanIdx.length,gl.UNSIGNED_SHORT,0);
+}
+try{initOcean()}catch(e){console.warn('WebGL ocean fallback',e)}
+
+let last=performance.now();function loop(now){const dt=Math.min(.035,(now-last)/1000);last=now;if(boatScene.classList.contains('active')){renderOcean(now);if(held.gas)state.speed+=.30*dt;else state.speed-=.07*dt;if(held.brake)state.speed-=.65*dt;state.speed=Math.max(0,Math.min(.32,state.speed));const turn=(.35+state.speed*2.6)*dt;if(held.left)state.angle-=90*turn;if(held.right)state.angle+=90*turn;const r=state.angle*Math.PI/180;
 const normAngle=((state.angle%360)+360)%360,dirNames=['n','ne','e','se','s','sw','w','nw'],dirName=dirNames[Math.round(normAngle/45)%8];
-if(playBoatImg.dataset.dir!==dirName){playBoatImg.src=`boat_${dirName}.png?v=3.3.0`;playBoatImg.dataset.dir=dirName;}
+if(playBoatImg.dataset.dir!==dirName){playBoatImg.src=`boat_${dirName}.png?v=3.4.0`;playBoatImg.dataset.dir=dirName;}
 const boatBob=Math.sin(now/980)*3.2+Math.sin(now/1730)*1.4;
 playBoat.style.transform=`translate(-50%,-50%) translateY(${boatBob}px) rotate(${boatLean}deg)`;
 boatScene.classList.toggle('movingBoat',state.speed>.025);
