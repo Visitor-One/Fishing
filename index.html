@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#0b4f69">
-<meta name="app-version" content="4.2.0">
+<meta name="app-version" content="4.3.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<title>Fishing Adventures V4.2</title>
+<title>Fishing Adventures V4.3</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#0b5870;color:#fff}button{font:inherit;color:inherit;border:0;touch-action:none}#app,.scene{position:absolute;inset:0;overflow:hidden}.scene{display:none}.scene.active{display:block}
 #boatScene{background:linear-gradient(#66b8c8 0 8%,#177394 8% 100%)}#boatScene:before{content:"";position:absolute;inset:8% 0 0;background:repeating-linear-gradient(165deg,rgba(255,255,255,.11) 0 2px,transparent 2px 22px),repeating-linear-gradient(15deg,rgba(255,255,255,.05) 0 1px,transparent 1px 30px)}
@@ -254,7 +254,7 @@ clip-path:polygon(3% 10%,97% 10%,97% 96%,3% 96%)}
  clip-path:polygon(45% 0,55% 0,88% 100%,12% 100%)!important;filter:blur(8px)!important}
 
 
-/* V4.2 – fotorealistischer Sonnenuntergang + echtes 3D-Meer */
+/* V4.3 – fotorealistischer Sonnenuntergang + echtes 3D-Meer */
 .sunsetSky,.sunDisc,.cloud,.trueHorizon,.horizonGlow,.horizonMist,.horizonLine{display:none!important}
 .photoSunset{display:none!important}
 #webglOcean{
@@ -278,34 +278,34 @@ clip-path:polygon(3% 10%,97% 10%,97% 96%,3% 96%)}
 }
 
 
-/* V4.2 generated sky and sun at sea horizon */
+/* V4.3 generated sky and sun at sea horizon */
 .sunsetSky,.trueHorizon,.sunPath,.sunDisc,.cloud,.horizonGlow,.horizonMist,.horizonLine{display:none!important}
 #boatScene{background:#2a243c!important}
-.simulatedSky{position:absolute;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 45% 25% at 50% 49%,rgba(255,200,88,.76),rgba(241,105,49,.34) 45%,transparent 85%),linear-gradient(to bottom,#302d51 0%,#66516b 19%,#b25c68 32%,#ef7954 43%,#ffb264 48.8%,#db744f 50%,#19354c 100%)}
-.sunAtHorizon{position:absolute;left:50%;top:48.8%;width:clamp(48px,7vw,100px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle at 45% 40%,#fffde6 0%,#fff6ad 48%,#ffce5e 78%,#ff8b3b 100%);box-shadow:0 0 28px 9px rgba(255,205,103,.8),0 0 110px 45px rgba(255,125,50,.32)}
+.simulatedSky{position:absolute;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 45% 25% at var(--sun-screen-x,50%) 49%,rgba(255,200,88,.76),rgba(241,105,49,.34) 45%,transparent 85%),linear-gradient(to bottom,#302d51 0%,#66516b 19%,#b25c68 32%,#ef7954 43%,#ffb264 48.8%,#db744f 50%,#19354c 100%)}
+.sunAtHorizon{position:absolute;left:var(--sun-screen-x,50%);top:48.8%;width:clamp(48px,7vw,100px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle at 45% 40%,#fffde6 0%,#fff6ad 48%,#ffce5e 78%,#ff8b3b 100%);box-shadow:0 0 28px 9px rgba(255,205,103,.8),0 0 110px 45px rgba(255,125,50,.32)}
 .skyClouds{position:absolute;inset:0 0 50%;opacity:.68;background:radial-gradient(ellipse 18% 3% at 18% 32%,#42384f 40%,transparent 90%),radial-gradient(ellipse 24% 4% at 76% 39%,#48354b 40%,transparent 90%),radial-gradient(ellipse 18% 3% at 37% 62%,#694258 40%,transparent 90%),radial-gradient(ellipse 16% 2% at 82% 70%,#74455a 40%,transparent 90%)}
 #webglOcean{clip-path:none!important;-webkit-clip-path:none!important}
 </style>
 </head>
 <body>
 <div id="app">
-<section id="boatScene" class="scene active"><div class="simulatedSky" aria-hidden="true"><div class="sunAtHorizon"></div><div class="skyClouds"></div></div><canvas id="webglOcean" aria-hidden="true"></canvas><div class="sunPath" aria-hidden="true"></div><div class="boatWake"></div><div class="playBoat" id="playBoat"><img id="playBoatImg" src="boat_n.png?v=4.2.0" alt="Offshore-Angelboot"></div>
+<section id="boatScene" class="scene active"><div class="simulatedSky" aria-hidden="true"><div class="sunAtHorizon"></div><div class="skyClouds"></div></div><canvas id="webglOcean" aria-hidden="true"></canvas><div class="sunPath" aria-hidden="true"></div><div class="boatWake"></div><div class="playBoat" id="playBoat"><img id="playBoatImg" src="boat_n.png?v=4.3.0" alt="Offshore-Angelboot"></div>
   <div class="simWorld" id="simWorld" aria-hidden="true">
-    <img class="simOceanPhoto" id="simOceanPhoto" src="simulator_ocean_v22.jpg?v=4.2.0" alt="">
+    <img class="simOceanPhoto" id="simOceanPhoto" src="simulator_ocean_v22.jpg?v=4.3.0" alt="">
     <div class="simWave"></div><div class="simWave w2"></div><div class="simSpray"></div>
   </div>
   <div class="hud" style="left:50%;top:16px;transform:translateX(-50%);font-weight:800;letter-spacing:.08em">OFFSHORE SIMULATOR</div>
   <div class="waveFoam" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
   <div id="goal" class="hud"><div class="label">FREIE FAHRT</div><strong>Fahr, wohin du möchtest</strong><div id="goalText">Zum Angeln anhalten.</div></div>
-  <div class="hud version">V4.2</div>
-  <div id="boat"><div class="wake"></div><img class="realBoat" src="offshore_boat_v20.png?v=4.2.0" alt="Isometrisches Offshore-Angelboot"></div>
+  <div class="hud version">V4.3</div>
+  <div id="boat"><div class="wake"></div><img class="realBoat" src="offshore_boat_v20.png?v=4.3.0" alt="Isometrisches Offshore-Angelboot"></div>
   <div class="controls steer"><button id="leftBtn" class="ctrl">←</button><button id="rightBtn" class="ctrl">→</button></div>
   <div class="controls pedals"><button id="gasBtn" class="ctrl gas">G</button><button id="brakeBtn" class="ctrl brake">B</button></div>
   <div class="hud speed"><span id="speedValue">0</span> km/h</div>
   <button id="fishBtn" class="hidden">🎣 Hier angeln</button>
 </section>
 <section id="fishingScene" class="scene">
-  <div class="hud version">V4.2</div>
+  <div class="hud version">V4.3</div>
   <div class="deckIso"><div class="console"></div><div class="cooler"></div><div class="rods"></div><div class="motor2"></div></div>
   <div id="player" class="player"><div class="head"></div><div class="body"></div><div class="leg l"></div><div class="leg r"></div><div class="shoe l"></div><div class="shoe r"></div></div>
   <div id="joystick" class="joy"><div id="stick" class="stick"></div></div>
@@ -387,7 +387,18 @@ function buildBoat(){const a=[];const navy=[0.05,0.13,0.26],white=[0.96,0.97,0.9
  function updateOcean(t){const d=ocean.data,b=ocean.base;let ptr=0;for(let i=0;i<b.length;i+=2){const s=waveSample(b[i],b[i+1],t);const nx=-s.dx, nz=-s.dz, inv=1/Math.hypot(nx,1,nz);d[ptr]=s.ox; d[ptr+1]=s.y; d[ptr+2]=s.oz; d[ptr+3]=nx*inv; d[ptr+4]=1*inv; d[ptr+5]=nz*inv; d[ptr+6]=0.02; d[ptr+7]=0.34+Math.max(0,s.y)*0.08; d[ptr+8]=0.48+Math.max(0,s.y)*0.10; ptr+=9;} gl.bindBuffer(gl.ARRAY_BUFFER,ocean.vb); gl.bufferSubData(gl.ARRAY_BUFFER,0,d); }
  function drawMesh(mesh,model,vp,isWater,indexed){const mvp=m4mul(vp,model); gl.uniformMatrix4fv(loc.mvp,false,mvp); gl.uniformMatrix4fv(loc.model,false,model); gl.uniform1f(loc.water,isWater?1:0); bindMesh(mesh,indexed); if(indexed) gl.drawElements(gl.TRIANGLES,mesh.count,gl.UNSIGNED_SHORT,0); else gl.drawArrays(gl.TRIANGLES,0,mesh.count); }
  function resizeCanvas(){const dpr=Math.min(window.devicePixelRatio||1,2);const w=Math.max(2,Math.floor(canvas.clientWidth*dpr)),h=Math.max(2,Math.floor(canvas.clientHeight*dpr)); if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;} gl.viewport(0,0,w,h); if(loc.horizon)gl.uniform1f(loc.horizon,h*0.512); return [w,h]; }
- function render3D(now){ if(!gl||!ready) return; const t=now*0.001; const [w,h]=resizeCanvas(); updateOcean(t); gl.clearColor(0.025,0.085,0.13,0); gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT); const sC=waveSample(boatState.x,boatState.z,t), sB=waveSample(boatState.x+Math.sin(boatState.yaw)*2.2,boatState.z-Math.cos(boatState.yaw)*2.2,t), sS=waveSample(boatState.x-Math.sin(boatState.yaw)*2.0,boatState.z+Math.cos(boatState.yaw)*2.0,t), sP=waveSample(boatState.x-Math.cos(boatState.yaw)*1.1,boatState.z-Math.sin(boatState.yaw)*1.1,t), sT=waveSample(boatState.x+Math.cos(boatState.yaw)*1.1,boatState.z+Math.sin(boatState.yaw)*1.1,t); const pitch=Math.atan2(sB.y-sS.y,4.2)*0.8; const roll=Math.atan2(sT.y-sP.y,2.2)*0.9; const boatY=sC.y+0.45; const camDist=9.8, camHeight=4.9; const eye=[boatState.x-Math.sin(boatState.yaw)*camDist, boatY+camHeight, boatState.z+Math.cos(boatState.yaw)*camDist]; const target=[boatState.x, boatY+0.72, boatState.z-0.8]; const vp=m4mul(m4persp(Math.PI/3,w/h,0.1,240), m4look(eye,target,[0,1,0])); drawMesh(ocean,m4identity(),vp,true,true); let model=m4mul(m4translate(boatState.x,boatY,boatState.z), m4mul(m4rotY(boatState.yaw), m4mul(m4rotZ(roll), m4mul(m4rotX(pitch), m4scale(0.85,0.85,0.85))))); drawMesh(boat,model,vp,false,false); }
+ function updateWorldSun(){
+  // Fixed sun azimuth in world coordinates: turning the boat changes its screen bearing.
+  const sunAzimuth=0;
+  const delta=Math.atan2(Math.sin(sunAzimuth-boatState.yaw),Math.cos(sunAzimuth-boatState.yaw));
+  const visible=Math.abs(delta)<Math.PI*0.49;
+  const x=50+Math.tan(delta)*50/Math.tan(Math.PI/6);
+  const sky=document.querySelector('.simulatedSky');
+  if(sky){sky.style.setProperty('--sun-screen-x',x+'%');}
+  const sun=document.querySelector('.sunAtHorizon');
+  if(sun)sun.style.visibility=visible?'visible':'hidden';
+}
+function render3D(now){ if(!gl||!ready) return; updateWorldSun(); const t=now*0.001; const [w,h]=resizeCanvas(); updateOcean(t); gl.clearColor(0.025,0.085,0.13,0); gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT); const sC=waveSample(boatState.x,boatState.z,t), sB=waveSample(boatState.x+Math.sin(boatState.yaw)*2.2,boatState.z-Math.cos(boatState.yaw)*2.2,t), sS=waveSample(boatState.x-Math.sin(boatState.yaw)*2.0,boatState.z+Math.cos(boatState.yaw)*2.0,t), sP=waveSample(boatState.x-Math.cos(boatState.yaw)*1.1,boatState.z-Math.sin(boatState.yaw)*1.1,t), sT=waveSample(boatState.x+Math.cos(boatState.yaw)*1.1,boatState.z+Math.sin(boatState.yaw)*1.1,t); const pitch=Math.atan2(sB.y-sS.y,4.2)*0.8; const roll=Math.atan2(sT.y-sP.y,2.2)*0.9; const boatY=sC.y+0.45; const camDist=9.8, camHeight=4.9; const eye=[boatState.x-Math.sin(boatState.yaw)*camDist, boatY+camHeight, boatState.z+Math.cos(boatState.yaw)*camDist]; const target=[boatState.x, boatY+0.72, boatState.z-0.8]; const vp=m4mul(m4persp(Math.PI/3,w/h,0.1,240), m4look(eye,target,[0,1,0])); drawMesh(ocean,m4identity(),vp,true,true); let model=m4mul(m4translate(boatState.x,boatY,boatState.z), m4mul(m4rotY(boatState.yaw), m4mul(m4rotZ(roll), m4mul(m4rotX(pitch), m4scale(0.85,0.85,0.85))))); drawMesh(boat,model,vp,false,false); }
  try{init3D()}catch(e){console.warn('init3D failed',e)}
 
  let last=performance.now();
